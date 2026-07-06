@@ -1,0 +1,120 @@
+/* CPPEM × PMPE — Landing única | brasão > headline > form > provas sociais */
+
+:root{
+  --red:#C8102E; --red-dark:#8E0B20; --red-bright:#E11733;
+  --blue:#0B2A6B; --blue-deep:#061A44;
+  --gold:#E8B923; --white:#F5F5F5; --ink:#0A0E1A;
+  --panel:rgba(10,16,32,.80); --line:rgba(255,255,255,.10); --muted:#B9C0D0;
+  --shadow:0 12px 34px rgba(200,16,46,.34);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--white);font-family:"Montserrat",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+img{display:block;max-width:100%}
+
+/* fundo: foto da tropa PMPE */
+.bg{position:fixed;inset:0;z-index:-2;background:url("public/tropa-pmpe.jpeg") center 22%/cover no-repeat}
+.bg-scrim{position:fixed;inset:0;z-index:-1;
+  background:
+    radial-gradient(120% 65% at 50% 0%,rgba(200,16,46,.28),transparent 58%),
+    linear-gradient(180deg,rgba(6,16,40,.78),rgba(10,14,26,.90) 55%,rgba(10,14,26,.97))}
+
+/* barra de aviso fixa (escassez) */
+.alert-bar{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;gap:.55rem;
+  background:linear-gradient(90deg,var(--red-dark),var(--red-bright),var(--red-dark));
+  color:#fff;font-family:"Montserrat",sans-serif;font-weight:800;font-size:.8rem;
+  letter-spacing:.1em;text-transform:uppercase;text-align:center;
+  padding:.6rem 1rem;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.alert-bar__dot{width:9px;height:9px;border-radius:50%;background:#fff;
+  box-shadow:0 0 0 0 rgba(255,255,255,.7);animation:pulse 1.4s ease-out infinite}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(255,255,255,.7)}
+  70%{box-shadow:0 0 0 8px rgba(255,255,255,0)}
+  100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+
+/* container central estreito */
+.page{max-width:600px;margin:0 auto;padding:3.4rem 1.3rem 3rem;text-align:center;display:flex;flex-direction:column;align-items:center}
+
+/* brasão */
+.brasao{height:120px;width:auto;margin-bottom:1.1rem;filter:drop-shadow(0 8px 22px rgba(0,0,0,.55))}
+
+/* selo de data */
+.badge{display:inline-block;font-family:"Montserrat",sans-serif;font-weight:700;font-size:.74rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--white);
+  background:var(--red);border:1px solid rgba(255,255,255,.22);
+  padding:.42rem .95rem;border-radius:999px;margin-bottom:1.1rem;
+  box-shadow:0 6px 18px rgba(200,16,46,.4)}
+
+/* 1. headline */
+.headline{font-family:"Bebas Neue",sans-serif;font-weight:400;text-transform:uppercase;
+  font-size:clamp(2.5rem,8.4vw,4rem);line-height:.96;letter-spacing:.01em;margin-bottom:1rem}
+.headline .hl{color:var(--red-bright)}
+.headline .hl2{color:var(--gold)}
+.sub{color:var(--muted);font-size:1.02rem;max-width:33rem;margin-bottom:1.9rem}
+.sub strong{color:var(--white);font-weight:700}
+
+/* 2+3. form + botão */
+.form{width:100%;max-width:420px;background:var(--panel);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-top:4px solid var(--red);border-radius:16px;
+  padding:1.6rem 1.4rem;box-shadow:0 24px 60px rgba(0,0,0,.6);text-align:left}
+.field{margin-bottom:.85rem}
+.field input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:10px;
+  color:var(--white);font-family:inherit;font-size:1rem;padding:.9rem;transition:border-color .15s,box-shadow .15s}
+.field input::placeholder{color:#818aa0}
+.field input:focus{outline:none;border-color:var(--red-bright);box-shadow:0 0 0 3px rgba(225,23,51,.22)}
+.field input.is-invalid{border-color:#ff5b5b;box-shadow:0 0 0 3px rgba(255,91,91,.18)}
+.error{display:block;color:#ff8a8a;font-size:.76rem;margin-top:.3rem;min-height:1em}
+
+.cta{width:100%;font-family:"Montserrat",sans-serif;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+  cursor:pointer;border:none;border-radius:11px;padding:1.05rem 1.4rem;font-size:.92rem;
+  color:var(--white);background:linear-gradient(180deg,var(--red-bright),var(--red));box-shadow:var(--shadow);
+  transition:transform .15s,box-shadow .2s,filter .2s;margin-top:.4rem}
+.cta:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(200,16,46,.5);filter:brightness(1.06)}
+.cta:active{transform:translateY(0)}
+.cta:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+/* progresso de vagas (escassez) */
+.vagas{margin-top:1rem}
+.vagas__bar{width:100%;height:11px;background:rgba(255,255,255,.10);border-radius:999px;
+  overflow:hidden;border:1px solid var(--line)}
+.vagas__fill{display:block;height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--red),var(--red-bright));
+  box-shadow:0 0 12px rgba(225,23,51,.6);
+  animation:vagas-grow 1.2s cubic-bezier(.22,1,.36,1) both}
+@keyframes vagas-grow{from{width:0}}
+.vagas__meta{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;
+  font-size:.78rem;color:var(--muted)}
+.vagas__count strong{color:var(--white);font-weight:700}
+.vagas__left{color:var(--red-bright);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+
+.note{text-align:center;font-size:.75rem;color:var(--muted);margin-top:.8rem}
+.success{margin-top:1rem;padding:.85rem;background:rgba(200,16,46,.14);border:1px solid var(--red-bright);
+  border-radius:10px;color:#ffd0d6;font-weight:600;font-size:.88rem;text-align:center}
+
+/* 4. provas sociais */
+.social{width:100%;margin-top:2.8rem}
+.social__eyebrow{display:block;font-family:"Bebas Neue",sans-serif;font-size:1.6rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:1.3rem}
+.carousel{position:relative;width:100%;overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.carousel__track{display:flex;gap:1rem;width:max-content;margin:0;padding:0;list-style:none;
+  will-change:transform;animation:carousel-scroll 45s linear infinite}
+.carousel:hover .carousel__track,
+.carousel:focus-within .carousel__track{animation-play-state:paused}
+.carousel__item{flex:0 0 auto;width:clamp(150px,42vw,190px);aspect-ratio:4/5;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.carousel__item img{width:100%;height:100%;object-fit:cover}
+@keyframes carousel-scroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-50% - .5rem),0,0)}}
+
+/* assinatura CPPEM */
+.signature{margin-top:2.6rem;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.signature__label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.signature .logo{height:34px;width:auto;filter:brightness(0) invert(1);opacity:.92}
+
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;transition:none!important}
+  .carousel{overflow-x:auto;-webkit-mask-image:none;mask-image:none}
+  .carousel__track{animation:none}
+}

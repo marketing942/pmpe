@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lançamento PMPE — Concurso Polícia Militar de Pernambuco | CPPEM</title>
+  <meta name="description" content="Lançamento oficial da preparação para o concurso da PMPE dia 14/07. Só participa quem se inscrever nesta página. Vagas limitadas — CPPEM Concursos." />
+  <meta property="og:title" content="Lançamento PMPE — dia 14/07. Garanta sua vaga." />
+  <meta property="og:image" content="/tropa-pmpe.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/png" href="public/logo-cppem.png" />
+  <!-- Meta Pixel noscript (fallback para navegadores sem JS) -->
+  <!-- ⚠️ TROQUE SEU_PIXEL_ID_AQUI pelo seu Pixel ID real -->
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=SEU_PIXEL_ID_AQUI&ev=PageView&noscript=1" />
+  </noscript>
+
+<!-- Pixel X App - START -->
+<script type='text/javascript'>
+!function(){var e=window.location.href,t=document.title,n=Date.now(),o=document.createElement('script');o.src='https://pxa.cppem.com.br/remote?url='+encodeURIComponent(e)+'&title='+encodeURIComponent(t)+'&time='+n,o.async=!0,document.head.appendChild(o)}()
+</script>
+<!-- Pixel X App - END -->
+  
+  <!-- Meta Pixel — CPPEM Concursos | ID: 566372342814166 -->
+  <script>
+    !function(f,b,e,v,n,t,s){
+      if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)
+    }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '566372342814166');
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=566372342814166&ev=PageView&noscript=1" />
+  </noscript>
+</head>
+<body>
+
+  <!-- Barra de aviso fixa (escassez) -->
+  <div class="alert-bar" role="alert">
+    <span class="alert-bar__dot" aria-hidden="true"></span>
+    AS VAGAS ESTÃO ACABANDO!
+  </div>
+
+  <!-- Fundo mesclado (colagem de todas as imagens) -->
+  <div class="bg" aria-hidden="true"></div>
+  <div class="bg-scrim" aria-hidden="true"></div>
+
+  <main class="page">
+
+    <!-- Brasão PMPE -->
+    <img class="brasao" src="public/brasao-pmpe.png" alt="Brasão da Polícia Militar de Pernambuco" />
+
+    <!-- Selo de data -->
+    <span class="badge">Aulão PMPE • 14/07</span>
+
+    <!-- 1. HEADLINE -->
+    <h1 class="headline">
+      Sua aprovação na <span class="hl">PMPE</span> começa <span class="hl2">dia 14/07</span>.
+    </h1>
+    <p class="sub">
+      O Aulão de preparação mais completo para a Polícia Militar de Pernambuco é
+      <strong>exclusivo para inscritos</strong>. Só participa quem se cadastrar aqui.
+    </p>
+
+    <!-- 2. FORMULÁRIO  +  3. BOTÃO -->
+    <form class="form xrmmmmzdllmckwinbxuh" id="lead-form" novalidate>
+      <div class="field">
+        <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Nome completo" required />
+        <span class="error" data-error-for="nome"></span>
+      </div>
+      <div class="field">
+        <input type="email" id="email" name="email" autocomplete="email" placeholder="E-mail" required />
+        <span class="error" data-error-for="email"></span>
+      </div>
+      <div class="field">
+        <input type="tel" id="telefone" name="telefone" autocomplete="tel" inputmode="numeric" placeholder="(00) 00000-0000" required />
+        <span class="error" data-error-for="telefone"></span>
+      </div>
+
+      <button type="submit" id="qouubbkupneyvdulgij" class="cta xrmmmmzdllmckwinbxuh">QUERO GARANTIR MINHA VAGA!</button>
+
+      <!-- Progresso de vagas (escassez) -->
+      <div class="vagas" role="group" aria-label="Vagas preenchidas">
+        <div class="vagas__bar"><span class="vagas__fill" style="width:91.5%"></span></div>
+        <div class="vagas__meta">
+          <span class="vagas__count"><strong>183</strong> de 200 vagas preenchidas</span>
+          <span class="vagas__left">Restam 17!</span>
+        </div>
+      </div>
+
+      <p class="note">Cadastro gratuito • Vagas limitadas • Seus dados estão seguros.</p>
+      <p class="success" id="form-success" role="status" hidden>
+        ✅ Inscrição confirmada!<br />
+        Você está sendo redirecionado para o WhatsApp.
+      </p>
+    </form>
+
+    <!-- 4. PROVAS SOCIAIS — slots para fotos dos alunos com o Prof. Everton Mota -->
+    <section class="social">
+      <span class="social__eyebrow">Nossos aprovados</span>
+
+      <!-- Carrossel infinito de fotos dos alunos (loop contínuo via CSS).
+           A 2ª sequência é uma cópia oculta de leitores de tela que garante
+           o loop perfeito. Pausa ao passar o mouse e respeita reduced-motion. -->
+      <div class="carousel" aria-label="Fotos de alunos com o Prof. Everton Mota">
+        <ul class="carousel__track">
+          <li class="carousel__item"><img src="public/foto1.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto2.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto3.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto4.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto5.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto6.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto7.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto8.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto9.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto10.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto11.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto12.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto13.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto14.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <!-- cópia para o loop infinito -->
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto1.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto2.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto3.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto4.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto5.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto6.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto7.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto8.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto9.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto10.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto11.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto12.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto13.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto14.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Assinatura CPPEM -->
+    <footer class="signature">
+      <span class="signature__label">Uma preparação</span>
+      <img class="logo" src="public/logo-cppem.png" alt="CPPEM Concursos Públicos" />
+    </footer>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
