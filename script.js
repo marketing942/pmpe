@@ -137,7 +137,7 @@ if (form) {
       // 4. Redireciona pelo link rastreável da PixelX
 
       setTimeout(() => {
-        window.location.href = `${PIXELX_WHATSAPP_REDIRECT}?text=${msg}`;
+        window.location.href = `${PIXELX_WHATSAPP_REDIRECT}`;
       }, 700);
 
     } catch (err) {
