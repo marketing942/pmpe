@@ -2,9 +2,9 @@
    CPPEM — Formulário → Google Sheets + Pixel + PixelX + WhatsApp
    ========================================================= */
 
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec?aba=CPPEM";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec?aba=PMPE";
 
-const PIXELX_WHATSAPP_REDIRECT = "https://pxa.cppem.com.br/lt/whatsapp-redirect";
+const PIXELX_WHATSAPP_REDIRECT = "https://pxa.cppem.com.br/lt/grupo-pmpe";
 
 /* --- Elementos --- */
 const form = document.getElementById("lead-form");
