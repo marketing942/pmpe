@@ -135,7 +135,6 @@ if (form) {
       }
 
       // 4. Redireciona pelo link rastreável da PixelX
-      const msg = encodeURIComponent("Quero começar minha preparação!");
 
       setTimeout(() => {
         window.location.href = `${PIXELX_WHATSAPP_REDIRECT}?text=${msg}`;
