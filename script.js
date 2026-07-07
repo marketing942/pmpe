@@ -10,21 +10,6 @@ const PIXELX_WHATSAPP_REDIRECT = "https://pxa.cppem.com.br/lt/grupo-pmpe";
 const form = document.getElementById("lead-form");
 const telefoneInput = document.getElementById("telefone");
 
-/* --- Máscara: (00) 00000-0000 --- */
-if (telefoneInput) {
-  telefoneInput.addEventListener("input", () => {
-    let d = telefoneInput.value.replace(/\D/g, "").slice(0, 11);
-    let out = "";
-
-    if (d.length > 0) out = "(" + d.slice(0, 2);
-    if (d.length >= 2) out += ") ";
-    if (d.length > 2) out += d.slice(2, 7);
-    if (d.length > 7) out += "-" + d.slice(7, 11);
-
-    telefoneInput.value = out;
-  });
-}
-
 /* --- Validação --- */
 function setError(id, msg) {
   const input = document.getElementById(id);
@@ -119,6 +104,27 @@ if (form) {
         }
       } catch (pixelError) {
         console.warn("[Pixel Meta] Erro ao disparar Lead:", pixelError);
+      }
+
+      // 2b. Dispara o Lead no PixelX (API oficial) — antes de qualquer redirecionamento
+      try {
+        if (window.pixel_x_app && typeof window.pixel_x_app.send_event === "function") {
+          await window.pixel_x_app.send_event({
+            // Evento
+            event_name: "Lead",
+
+            // Lead
+            lead_name: payload.nome,
+            lead_email: payload.email,
+            lead_phone: payload.telefone
+          });
+
+          console.log("[PixelX] Lead disparado com sucesso.");
+        } else {
+          console.warn("[PixelX] window.pixel_x_app.send_event não encontrado.");
+        }
+      } catch (pixelxError) {
+        console.warn("[PixelX] Erro ao disparar Lead:", pixelxError);
       }
 
       // 3. Mostra sucesso
