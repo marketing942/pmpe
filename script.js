@@ -4,7 +4,7 @@
 
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec?aba=PMPE";
 
-const PIXELX_WHATSAPP_REDIRECT = "https://pxa.cppem.com.br/lt/grupo-pmpe";
+const PIXELX_WHATSAPP_REDIRECT = "https://wa.me/5581973105354?text=Quero%20come%C3%A7ar%20minha%20prepara%C3%A7%C3%A3o%20para%20PMPE!%20%F0%9F%94%A5%F0%9F%92%80";
 
 /* --- Elementos --- */
 const form = document.getElementById("lead-form");
