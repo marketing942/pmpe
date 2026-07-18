@@ -10,6 +10,40 @@ const PIXELX_WHATSAPP_REDIRECT = "https://pxa.cppem.com.br/lt/grupo-pmpe";
 const form = document.getElementById("lead-form");
 const telefoneInput = document.getElementById("telefone");
 
+/* =========================================================
+   Modal / Popup do formulário
+   ========================================================= */
+const modal = document.getElementById("lead-modal");
+
+function openModal() {
+  if (!modal) return;
+  modal.hidden = false;
+  document.body.style.overflow = "hidden";
+  const firstInput = modal.querySelector("input");
+  if (firstInput) setTimeout(() => firstInput.focus(), 60);
+}
+
+function closeModal() {
+  if (!modal) return;
+  modal.hidden = true;
+  document.body.style.overflow = "";
+}
+
+document.querySelectorAll("[data-open-modal]").forEach((el) => {
+  el.addEventListener("click", (e) => {
+    e.preventDefault();
+    openModal();
+  });
+});
+
+document.querySelectorAll("[data-close-modal]").forEach((el) => {
+  el.addEventListener("click", closeModal);
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modal && !modal.hidden) closeModal();
+});
+
 /* --- Validação --- */
 function setError(id, msg) {
   const input = document.getElementById(id);
@@ -153,7 +187,7 @@ if (form) {
 
       if (btn) {
         btn.disabled = false;
-        btn.textContent = "QUERO PARTICIPAR DO LANÇAMENTO";
+        btn.textContent = "QUERO VESTIR A FARDA";
       }
     }
   });

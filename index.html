@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PMPE | CPPEM</title>
-  <meta name="description" content="Preparação completa para os concursos da PMPE. Só participa quem se inscrever nesta página — CPPEM Concursos." />
-  <meta property="og:title" content="Concursos da PMPE — garanta sua preparação." />
+  <title>PMPE | CPPEM Concursos</title>
+  <meta name="description" content="Sua preparação completa para vestir a farda da Polícia Militar de Pernambuco. Aprovação com quem já passou — CPPEM Concursos." />
+  <meta property="og:title" content="PMPE — Comece agora a estudar e vista a farda." />
   <meta property="og:image" content="/tropa-pmpe.jpeg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,7 +24,7 @@
 !function(){var e=window.location.href,t=document.title,n=Date.now(),o=document.createElement('script');o.src='https://pxa.cppem.com.br/remote?url='+encodeURIComponent(e)+'&title='+encodeURIComponent(t)+'&time='+n,o.async=!0,document.head.appendChild(o)}()
 </script>
 <!-- Pixel X App - END -->
-  
+
   <!-- Meta Pixel — CPPEM Concursos | ID: 566372342814166 -->
   <script>
     !function(f,b,e,v,n,t,s){
@@ -45,103 +45,308 @@
 </head>
 <body>
 
-  <!-- Barra de aviso fixa (escassez) -->
-  <div class="alert-bar" role="alert">
-    <span class="alert-bar__dot" aria-hidden="true"></span>
-    AS VAGAS ESTÃO ACABANDO!
+  <!-- Topbar fixa (escassez) -->
+  <div class="topbar" role="alert">
+    <span class="topbar__dot" aria-hidden="true"></span>
+    1.250 VAGAS LIBERADAS NA PMPE — COMECE A ESTUDAR AGORA
   </div>
 
-  <!-- Fundo mesclado (colagem de todas as imagens) -->
+  <!-- Fundo (foto da tropa PMPE) -->
   <div class="bg" aria-hidden="true"></div>
   <div class="bg-scrim" aria-hidden="true"></div>
 
   <main class="page">
 
-    <!-- Brasão da PMPE -->
-    <img class="brasao" src="public/brasao-pmpe.png" alt="Brasão da Polícia Militar de Pernambuco" />
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
 
-    <!-- 1. HEADLINE -->
-    <h1 class="headline">
-      Sua aprovação nos <span class="hl">concursos da PMPE</span> começa <span class="hl2">agora</span>.
-    </h1>
-    <p class="sub">
-      A preparação mais completa para vestir sua tão sonhada farda é
-      <strong>exclusiva para inscritos</strong>. Só participa quem se cadastrar aqui.
-    </p>
-
-    <!-- 2. FORMULÁRIO  +  3. BOTÃO -->
-    <form class="form xrmmmmzdllmckwinbxuh" id="lead-form" novalidate>
-      <div class="field">
-        <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Nome completo" required />
-        <span class="error" data-error-for="nome"></span>
-      </div>
-      <div class="field">
-        <input type="email" id="email" name="email" autocomplete="email" placeholder="E-mail" required />
-        <span class="error" data-error-for="email"></span>
-      </div>
-      <div class="field">
-        <input type="tel" id="telefone" name="telefone" autocomplete="tel" inputmode="numeric" placeholder="(00) 00000-0000" required />
-        <span class="error" data-error-for="telefone"></span>
+      <!-- Logos: brasão PMPE + CPPEM -->
+      <div class="brands">
+        <img class="brands__pmpe" src="public/brasao-pmpe.png" alt="Brasão da Polícia Militar de Pernambuco" />
+        <span class="brands__divider" aria-hidden="true"></span>
+        <img class="brands__cppem" src="public/logo-cppem.png" alt="CPPEM Concursos Públicos" />
       </div>
 
-      <button type="submit" class="cta">QUERO GARANTIR MINHA VAGA!</button>
-
-      <p class="note">Cadastro gratuito • Seus dados estão seguros.</p>
-      <p class="success" id="form-success" role="status" hidden>
-        ✅ Inscrição confirmada!<br />
-        Você está sendo redirecionado para o WhatsApp.
+      <!-- Headline -->
+      <h1 class="headline">
+        Sua aprovação na <span class="hl">PMPE</span> começa <span class="hl2">agora</span>.
+      </h1>
+      <p class="sub">
+        A preparação mais completa para vestir a sua tão sonhada farda da
+        <strong>Polícia Militar de Pernambuco</strong>. Direto com quem já passou.
       </p>
-    </form>
 
-    <!-- 4. PROVAS SOCIAIS — slots para fotos dos alunos com o Prof. Everton Mota -->
+      <!-- Vídeo -->
+      <div class="video">
+        <iframe
+          id="panda-3b7416bb-59a4-4337-9e66-18ad2ee45f49"
+          src="https://player-vz-cdf20c7e-010.tv.pandavideo.com.br/embed/?v=3b7416bb-59a4-4337-9e66-18ad2ee45f49"
+          style="border:none;"
+          allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
+          allowfullscreen="true"
+          width="720" height="360"
+          fetchpriority="high"></iframe>
+      </div>
+
+      <!-- CTA -->
+      <button type="button" class="cta" data-open-modal>QUERO VESTIR A FARDA</button>
+    </section>
+
+    <!-- Barra de liberação de vagas -->
+    <div class="release-bar">
+      <span class="release-bar__icon" aria-hidden="true">⚠</span>
+      FORAM LIBERADAS 1.250 VAGAS NA PMPE · QUEM COMEÇAR A ESTUDAR AGORA VAI VESTIR A FARDA
+    </div>
+
+    <!-- ===================== QUEM TE ACOMPANHA ===================== -->
+    <section class="mentor">
+      <div class="mentor__photo">
+        <img src="public/everton-mota.jpg" alt="Prof. Everton Mota" />
+        <span class="mentor__tag">
+          <strong>PROF. EVERTON MOTA</strong>
+          MENTOR · CPPEM CONCURSOS
+        </span>
+      </div>
+      <div class="mentor__content">
+        <span class="eyebrow">Quem te acompanha</span>
+        <h2 class="section-title">Quem te orienta aqui <span class="hl">já passou.</span></h2>
+        <p>
+          Aprovado em <strong>15 concursos públicos</strong>, o Prof. Everton Mota não ensina pelo
+          livro. Ensina pela estrada que ele mesmo caminhou. Há mais de 7 anos forma candidatos
+          para carreiras policiais no Nordeste, com mais de 14 mil aprovados.
+        </p>
+        <p>
+          Na sua preparação para a <strong>PMPE</strong>, você não vai assistir mais uma aula
+          gravada e ficar sozinho. Vai ter o professor, ao vivo, todo mês, te corrigindo, te
+          direcionando, e respondendo pessoalmente o que está travando seu estudo.
+        </p>
+        <div class="stats">
+          <div class="stat"><span class="stat__num">15</span><span class="stat__label">Concursos aprovados</span></div>
+          <div class="stat"><span class="stat__num">14K+</span><span class="stat__label">Alunos aprovados</span></div>
+          <div class="stat"><span class="stat__num">7+</span><span class="stat__label">Anos de atuação</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SE VOCÊ SE VÊ NISSO ===================== -->
+    <section class="pain">
+      <span class="eyebrow">Se você se vê nisso, esta página é pra você</span>
+      <h2 class="section-title">
+        Você quer uma farda,<br />mas <span class="hl">estuda no escuro</span> e não sabe<br />se está no caminho certo.
+      </h2>
+      <p class="section-lead">
+        A maioria dos candidatos chega no dia da prova sem ter feito o básico certo. Sem cronograma,
+        sem revisões, sem ninguém pra mostrar onde está errando. E a farda não espera ninguém.
+      </p>
+      <div class="pain__grid">
+        <article class="pain__card">
+          <span class="pain__num">01</span>
+          <h3>Estuda muito, mas não vê resultado</h3>
+          <p>Você passa horas em frente à apostila e, quando faz uma simulada, erra o que parecia básico. Falta direção, não força de vontade.</p>
+        </article>
+        <article class="pain__card">
+          <span class="pain__num">02</span>
+          <h3>Não tem cronograma de verdade</h3>
+          <p>Estuda o que vem na cabeça, sem meta diária, sem ordem. Quando vê, passou um mês e o conteúdo essencial nem foi tocado.</p>
+        </article>
+        <article class="pain__card">
+          <span class="pain__num">03</span>
+          <h3>Estuda sozinho e desanima</h3>
+          <p>Sem grupo, sem mentor, sem ninguém pra te puxar quando bate a vontade de desistir. Ninguém atravessa essa estrada sozinho.</p>
+        </article>
+        <article class="pain__card">
+          <span class="pain__num">04</span>
+          <h3>Sente o tempo se esgotando</h3>
+          <p>O edital já saiu. Quem está organizado já largou na frente. Quem está perdido vai correr atrás.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================== VAGAS PMPE ===================== -->
+    <section class="vagas">
+      <span class="eyebrow">Concurso PMPE 2026</span>
+      <h2 class="section-title"><span class="hl">1.250 vagas</span> abertas.<br />Comece agora a disputar a sua.</h2>
+      <p class="section-lead">
+        A Polícia Militar de Pernambuco liberou 1.250 vagas para Soldado. Com uma preparação focada e
+        direcionada, você fica pronto para disputar cada uma delas.
+      </p>
+      <div class="vagas__wrap">
+        <article class="vagas__card">
+          <img src="public/brasao-pmpe.png" alt="Brasão da PMPE" />
+          <h3>Polícia Militar</h3>
+          <span class="vagas__sub">PMPE</span>
+          <span class="vagas__num">1.250 VAGAS</span>
+          <span class="vagas__detail">1.250 Soldados</span>
+        </article>
+        <div class="vagas__total">
+          <span class="vagas__total-num">1.250</span>
+          <span class="vagas__total-label">Vagas abertas na Polícia Militar de Pernambuco</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== O QUE ESTÁ INCLUSO ===================== -->
+    <section class="included">
+      <span class="eyebrow">O que você recebe</span>
+      <h2 class="section-title">Tudo que você precisa pra <span class="hl">vestir a farda</span></h2>
+      <p class="section-lead">
+        Cada parte foi montada pra cobrir um ponto fraco do candidato comum. Quem entra aqui não
+        estuda mais no escuro.
+      </p>
+      <div class="included__grid">
+        <article class="feat">
+          <span class="feat__tag">Ao vivo</span>
+          <h3>Acompanhamento ao vivo</h3>
+          <p>Você se conecta diretamente com o Prof. Everton. Tira dúvidas em tempo real, corrige rotas e ajusta o estudo com quem já passou pelo caminho e foi aprovado.</p>
+        </article>
+        <article class="feat">
+          <span class="feat__tag">Personalizado</span>
+          <h3>Cronograma individualizado</h3>
+          <p>Você informa o tempo que tem disponível e recebe um cronograma feito sob medida. Estuda 2h por dia? 6h? Tanto faz. O plano se ajusta a você, não o contrário.</p>
+        </article>
+        <article class="feat">
+          <span class="feat__tag">Acervo completo</span>
+          <h3>Todas as aulas e PDFs da PMPE</h3>
+          <p>Você acessa o acervo completo de aulas e materiais complementares voltados ao edital da PMPE. Sem precisar caçar conteúdo solto pela internet.</p>
+        </article>
+        <article class="feat">
+          <span class="feat__tag">Método AQSR</span>
+          <h3>Metas diárias organizadas</h3>
+          <p>Aulas, Questões, Simulados e Revisões (AQSR) entregues em metas diárias. Você abre e já sabe exatamente o que fazer no dia. Sem perder tempo decidindo.</p>
+        </article>
+        <article class="feat">
+          <span class="feat__tag">Em tempo real</span>
+          <h3>Gráficos de evolução</h3>
+          <p>Você acompanha sua taxa de acerto em questões matéria por matéria. Vê o que está crescendo, o que precisa de revisão, e prova pra si mesmo que está evoluindo de verdade.</p>
+        </article>
+        <article class="feat feat--highlight">
+          <span class="feat__tag">Exclusivo</span>
+          <h3>Grupo no WhatsApp</h3>
+          <p>Convivência diária com mentores, monitores, equipe pedagógica e outros alunos da turma. Você não vai estudar sozinho. Vai estudar cercado de gente que quer o mesmo que você.</p>
+        </article>
+      </div>
+      <button type="button" class="cta cta--center" data-open-modal>QUERO VESTIR A FARDA</button>
+    </section>
+
+    <!-- ===================== ALUNOS ===================== -->
     <section class="social">
-      <span class="social__eyebrow">Nossos aprovados</span>
+      <span class="eyebrow">Resultados reais</span>
+      <h2 class="section-title">Alunos que já <span class="hl">vestiram a farda</span></h2>
+      <p class="section-lead">
+        Histórias reais de quem chegou onde você quer chegar com a metodologia do Prof. Everton.
+      </p>
 
-      <!-- Carrossel infinito de fotos dos alunos (loop contínuo via CSS).
-           A 2ª sequência é uma cópia oculta de leitores de tela que garante
-           o loop perfeito. Pausa ao passar o mouse e respeita reduced-motion. -->
       <div class="carousel" aria-label="Fotos de alunos com o Prof. Everton Mota">
         <ul class="carousel__track">
-          <li class="carousel__item"><img src="public/foto1.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto2.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto3.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto4.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto5.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto6.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto7.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto8.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto9.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto10.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto11.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto12.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto13.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
-          <li class="carousel__item"><img src="public/foto14.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="Aluno com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto1.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto2.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto3.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto4.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto5.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto6.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto7.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto8.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto9.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto10.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto11.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto12.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto13.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
+          <li class="carousel__item"><img src="public/foto14.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="Aluno aprovado com o Prof. Everton Mota" /></li>
           <!-- cópia para o loop infinito -->
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto1.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto2.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto3.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto4.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto5.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto6.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto7.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto8.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto9.webp"  width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto10.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto11.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto12.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto13.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
-          <li class="carousel__item" aria-hidden="true"><img src="public/foto14.webp" width="320" height="400" loading="eager" fetchpriority="low" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto1.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto2.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto3.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto4.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto5.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto6.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto7.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto8.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto9.webp"  width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto10.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto11.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto12.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto13.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
+          <li class="carousel__item" aria-hidden="true"><img src="public/foto14.webp" width="320" height="400" loading="lazy" decoding="async" draggable="false" alt="" /></li>
         </ul>
       </div>
     </section>
 
-    <!-- Assinatura CPPEM -->
-    <footer class="signature">
-      <span class="signature__label">Uma preparação</span>
-      <img class="logo" src="public/logo-cppem.png" alt="CPPEM Concursos Públicos" />
+    <!-- ===================== FAQ ===================== -->
+    <section class="faq">
+      <span class="eyebrow">Dúvidas frequentes</span>
+      <h2 class="section-title"><span class="hl">Perguntas</span> e respostas</h2>
+
+      <div class="faq__list">
+        <details class="faq__item">
+          <summary>Essa preparação serve pra qual concurso?</summary>
+          <div class="faq__answer">É totalmente focada no concurso da Polícia Militar de Pernambuco (PMPE). Todo o conteúdo, cronograma e revisões são direcionados ao edital da PMPE para você chegar pronto no dia da prova.</div>
+        </details>
+        <details class="faq__item">
+          <summary>Como funciona na prática?</summary>
+          <div class="faq__answer">Você recebe um cronograma individualizado com metas diárias de aulas, questões, simulados e revisões. Acompanha o Prof. Everton ao vivo, tira dúvidas, evolui matéria por matéria e conta com o grupo no WhatsApp pra não estudar sozinho.</div>
+        </details>
+        <details class="faq__item">
+          <summary>As aulas ao vivo ficam gravadas?</summary>
+          <div class="faq__answer">Sim. Todos os encontros ao vivo ficam gravados e disponíveis no acervo. Se você não puder assistir no horário, revê depois quantas vezes precisar.</div>
+        </details>
+        <details class="faq__item">
+          <summary>Eu trabalho o dia todo. Esse modelo funciona pra mim?</summary>
+          <div class="faq__answer">Funciona. O cronograma é montado a partir do tempo que você tem. Estudando 2h por dia ou 6h, o plano se ajusta à sua rotina — não o contrário.</div>
+        </details>
+        <details class="faq__item">
+          <summary>Eu nunca estudei pra concurso. Vou conseguir acompanhar?</summary>
+          <div class="faq__answer">Vai. O método foi feito pra quem está começando do zero. Você é conduzido passo a passo, com orientação direta de quem já foi aprovado, sem precisar decidir sozinho por onde começar.</div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ===================== RODAPÉ ===================== -->
+    <footer class="footer">
+      <div class="footer__brands">
+        <img class="footer__cppem" src="public/logo-cppem.png" alt="CPPEM Concursos Públicos" />
+        <span class="footer__divider" aria-hidden="true"></span>
+        <img class="footer__pmpe" src="public/brasao-pmpe.png" alt="Brasão da Polícia Militar de Pernambuco" />
+      </div>
+      <p class="footer__quote">"Seu sonho é o nosso principal objetivo."</p>
+      <button type="button" class="footer__support" data-open-modal>Suporte via WhatsApp</button>
+      <p class="footer__legal">© 2026 CPPEM Concursos · Caruaru, Pernambuco · Todos os direitos reservados</p>
     </footer>
 
   </main>
+
+  <!-- ===================== MODAL / POPUP FORMULÁRIO ===================== -->
+  <div class="modal" id="lead-modal" hidden>
+    <div class="modal__overlay" data-close-modal></div>
+    <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button type="button" class="modal__close" data-close-modal aria-label="Fechar">&times;</button>
+
+      <h2 class="modal__title" id="modal-title">Garanta sua vaga na PMPE</h2>
+      <p class="modal__sub">Preencha seus dados e fale agora com a nossa equipe.</p>
+
+      <form class="form xrmmmmzdllmckwinbxuh" id="lead-form" novalidate>
+        <div class="field">
+          <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Nome completo" required />
+          <span class="error" data-error-for="nome"></span>
+        </div>
+        <div class="field">
+          <input type="email" id="email" name="email" autocomplete="email" placeholder="E-mail" required />
+          <span class="error" data-error-for="email"></span>
+        </div>
+        <div class="field">
+          <input type="tel" id="telefone" name="telefone" autocomplete="tel" inputmode="numeric" placeholder="(00) 00000-0000" required />
+          <span class="error" data-error-for="telefone"></span>
+        </div>
+
+        <button type="submit" class="cta">QUERO VESTIR A FARDA</button>
+
+        <p class="note">Cadastro gratuito • Seus dados estão seguros.</p>
+        <p class="success" id="form-success" role="status" hidden>
+          ✅ Inscrição confirmada!<br />
+          Você está sendo redirecionado para o WhatsApp.
+        </p>
+      </form>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
