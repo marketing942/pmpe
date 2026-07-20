@@ -163,26 +163,9 @@ if (form) {
         console.warn("[Pixel Meta] Erro ao disparar Lead:", pixelError);
       }
 
-      // 2b. Dispara o Lead no PixelX (API oficial) — antes de qualquer redirecionamento
-      try {
-        if (window.pixel_x_app && typeof window.pixel_x_app.send_event === "function") {
-          await window.pixel_x_app.send_event({
-            // Evento
-            event_name: "Lead",
-
-            // Lead
-            lead_name: payload.nome,
-            lead_email: payload.email,
-            lead_phone: payload.telefone
-          });
-
-          console.log("[PixelX] Lead disparado com sucesso.");
-        } else {
-          console.warn("[PixelX] window.pixel_x_app.send_event não encontrado.");
-        }
-      } catch (pixelxError) {
-        console.warn("[PixelX] Erro ao disparar Lead:", pixelxError);
-      }
+      // 2b. Conversão do PixelX: disparada pela classe do botão (só é aplicada
+      //     quando o formulário está válido — ver syncPixelClass). Não há
+      //     send_event aqui para não contar o Lead em duplicidade.
 
       // 3. Mostra sucesso
       form.reset();
