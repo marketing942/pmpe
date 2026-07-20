@@ -63,6 +63,29 @@ function clearError(id) {
 
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
+/* Checagem silenciosa (sem mexer na UI de erro), usada para só liberar
+   a classe de conversão do PixelX quando o formulário estiver realmente válido. */
+function isFormValid() {
+  const nome = document.getElementById("nome")?.value.trim() || "";
+  const email = document.getElementById("email")?.value.trim() || "";
+  const tel = telefoneInput?.value.replace(/\D/g, "") || "";
+
+  return nome.length >= 2 && isEmail(email) && tel.length >= 11;
+}
+
+const PIXELX_CLASS = "gbcbxsmvgqsjeajougck";
+
+function syncPixelClass() {
+  const btn = document.getElementById("lead-submit");
+  if (btn) btn.classList.toggle(PIXELX_CLASS, isFormValid());
+}
+
+if (form) {
+  form.addEventListener("input", syncPixelClass);
+  form.addEventListener("change", syncPixelClass);
+  syncPixelClass();
+}
+
 function validate() {
   let ok = true;
 
@@ -163,6 +186,7 @@ if (form) {
 
       // 3. Mostra sucesso
       form.reset();
+      syncPixelClass(); // remove a classe de conversão do botão após limpar o form
 
       const successEl = document.getElementById("form-success");
 
