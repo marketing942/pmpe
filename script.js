@@ -63,6 +63,14 @@ function clearError(id) {
 
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
+/* Gera um ID único por envio, usado como eventID do Lead no Meta (deduplicação). */
+function generateEventId() {
+  if (window.crypto && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return "lead_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
+}
+
 /* Checagem silenciosa (sem mexer na UI de erro), usada para só liberar
    a classe de conversão do PixelX quando o formulário estiver realmente válido. */
 function isFormValid() {
@@ -147,15 +155,19 @@ if (form) {
         body: JSON.stringify(payload)
       });
 
-      // 2. Dispara evento Lead no Meta Pixel
+      // 2. Dispara evento Lead no Meta Pixel (com eventID para deduplicação:
+      //    se o mesmo Lead chegar também pela detecção automática/CAPI com este
+      //    ID, o Meta conta apenas uma vez).
       try {
         if (typeof fbq === "function") {
+          const eventId = generateEventId();
+
           fbq("track", "Lead", {
             content_name: "captura_cppem",
             page_url: window.location.href
-          });
+          }, { eventID: eventId });
 
-          console.log("[Pixel Meta] Lead disparado com sucesso.");
+          console.log("[Pixel Meta] Lead disparado com sucesso. eventID:", eventId);
         } else {
           console.warn("[Pixel Meta] fbq não encontrado.");
         }
@@ -164,8 +176,8 @@ if (form) {
       }
 
       // 2b. Conversão do PixelX: disparada pela classe do botão (só é aplicada
-      //     quando o formulário está válido — ver syncPixelClass). Não há
-      //     send_event aqui para não contar o Lead em duplicidade.
+      //     quando o formulário está válido — ver syncPixelClass). Assim o Lead
+      //     chega ao PixelX (classe) e ao Meta (fbq), sem duplicar em nenhum.
 
       // 3. Mostra sucesso
       form.reset();
