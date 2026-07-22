@@ -68,7 +68,7 @@ function validate() {
 
   const nome = document.getElementById("nome")?.value.trim() || "";
   const email = document.getElementById("email")?.value.trim() || "";
-  const tel = telefoneInput?.value.replace(/\D/g, "") || "";
+  const tel = telefoneInput?.value.trim() || "";
 
   ["nome", "email", "telefone"].forEach(clearError);
 
@@ -82,8 +82,8 @@ function validate() {
     ok = false;
   }
 
-  if (tel.length < 11) {
-    setError("telefone", "Informe o telefone com DDD.");
+  if (tel.length < 1) {
+    setError("telefone", "Informe seu WhatsApp.");
     ok = false;
   }
 
