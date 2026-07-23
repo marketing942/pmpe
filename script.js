@@ -1,10 +1,10 @@
 /* =========================================================
-   CPPEM — Formulário → Google Sheets + Pixel + PixelX + WhatsApp
+   CPPEM — Formulário → Google Sheets + WhatsApp
    ========================================================= */
 
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec?aba=PMPE";
 
-const PIXELX_WHATSAPP_REDIRECT = "https://wa.me/5581973105354?text=Quero%20come%C3%A7ar%20minha%20prepara%C3%A7%C3%A3o%20para%20PMPE!%20%F0%9F%94%A5%F0%9F%92%80";
+const WHATSAPP_REDIRECT = "https://wa.me/5581973105354?text=Quero%20come%C3%A7ar%20minha%20prepara%C3%A7%C3%A3o%20para%20PMPE!%20%F0%9F%94%A5%F0%9F%92%80";
 
 /* --- Elementos --- */
 const form = document.getElementById("lead-form");
@@ -63,43 +63,12 @@ function clearError(id) {
 
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
-/* Gera um ID único por envio, usado como eventID do Lead no Meta (deduplicação). */
-function generateEventId() {
-  if (window.crypto && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
-  }
-  return "lead_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10);
-}
-
-/* Checagem silenciosa (sem mexer na UI de erro), usada para só liberar
-   a classe de conversão do PixelX quando o formulário estiver realmente válido. */
-function isFormValid() {
-  const nome = document.getElementById("nome")?.value.trim() || "";
-  const email = document.getElementById("email")?.value.trim() || "";
-  const tel = telefoneInput?.value.replace(/\D/g, "") || "";
-
-  return nome.length >= 2 && isEmail(email) && tel.length >= 11;
-}
-
-const PIXELX_CLASS = "gbcbxsmvgqsjeajougck";
-
-function syncPixelClass() {
-  const btn = document.getElementById("lead-submit");
-  if (btn) btn.classList.toggle(PIXELX_CLASS, isFormValid());
-}
-
-if (form) {
-  form.addEventListener("input", syncPixelClass);
-  form.addEventListener("change", syncPixelClass);
-  syncPixelClass();
-}
-
 function validate() {
   let ok = true;
 
   const nome = document.getElementById("nome")?.value.trim() || "";
   const email = document.getElementById("email")?.value.trim() || "";
-  const tel = telefoneInput?.value.replace(/\D/g, "") || "";
+  const tel = telefoneInput?.value.trim() || "";
 
   ["nome", "email", "telefone"].forEach(clearError);
 
@@ -113,8 +82,8 @@ function validate() {
     ok = false;
   }
 
-  if (tel.length < 11) {
-    setError("telefone", "Informe o telefone com DDD.");
+  if (tel.length < 1) {
+    setError("telefone", "Informe seu WhatsApp.");
     ok = false;
   }
 
@@ -155,33 +124,8 @@ if (form) {
         body: JSON.stringify(payload)
       });
 
-      // 2. Dispara evento Lead no Meta Pixel (com eventID para deduplicação:
-      //    se o mesmo Lead chegar também pela detecção automática/CAPI com este
-      //    ID, o Meta conta apenas uma vez).
-      try {
-        if (typeof fbq === "function") {
-          const eventId = generateEventId();
-
-          fbq("track", "Lead", {
-            content_name: "captura_cppem",
-            page_url: window.location.href
-          }, { eventID: eventId });
-
-          console.log("[Pixel Meta] Lead disparado com sucesso. eventID:", eventId);
-        } else {
-          console.warn("[Pixel Meta] fbq não encontrado.");
-        }
-      } catch (pixelError) {
-        console.warn("[Pixel Meta] Erro ao disparar Lead:", pixelError);
-      }
-
-      // 2b. Conversão do PixelX: disparada pela classe do botão (só é aplicada
-      //     quando o formulário está válido — ver syncPixelClass). Assim o Lead
-      //     chega ao PixelX (classe) e ao Meta (fbq), sem duplicar em nenhum.
-
-      // 3. Mostra sucesso
+      // 2. Mostra sucesso
       form.reset();
-      syncPixelClass(); // remove a classe de conversão do botão após limpar o form
 
       const successEl = document.getElementById("form-success");
 
@@ -193,10 +137,10 @@ if (form) {
         });
       }
 
-      // 4. Redireciona pelo link rastreável da PixelX
+      // 3. Redireciona para o WhatsApp
 
       setTimeout(() => {
-        window.location.href = `${PIXELX_WHATSAPP_REDIRECT}`;
+        window.location.href = `${WHATSAPP_REDIRECT}`;
       }, 700);
 
     } catch (err) {
