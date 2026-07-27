@@ -194,6 +194,23 @@ img{display:block;max-width:100%}
 .modal__title{font-family:"Bebas Neue",sans-serif;font-size:2rem;letter-spacing:.01em;text-transform:uppercase;
   text-align:center;margin-bottom:.3rem}
 .modal__sub{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:1.4rem}
+.modal__title .hl{color:var(--red-bright)}
+
+/* ===================== EXIT POPUP ===================== */
+.exit__eyebrow{display:flex;width:fit-content;margin:0 auto 1rem}
+#exit-modal .modal__title{font-size:1.72rem;line-height:1.04;text-wrap:balance}
+#exit-modal .modal__sub{margin-bottom:.9rem}
+.exit__benefits{list-style:none;margin:0 0 1.3rem;padding:1rem 1.1rem;
+  background:linear-gradient(180deg,rgba(200,16,46,.18),rgba(10,16,32,.6));
+  border:1px solid rgba(225,23,51,.35);border-radius:14px}
+.exit__benefits li{display:flex;align-items:flex-start;gap:.6rem;
+  color:var(--white);font-size:.92rem;line-height:1.45;text-align:left}
+.exit__benefits li::before{content:"✓";color:var(--red-bright);font-weight:800;flex:0 0 auto}
+.exit__decline{display:block;margin:.9rem auto 0;background:none;border:none;color:var(--muted);
+  font-family:inherit;font-size:.78rem;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;transition:color .15s}
+.exit__decline:hover{color:var(--white)}
+.exit__decline:focus-visible{outline:2px solid var(--red-bright);outline-offset:3px;border-radius:4px}
 
 /* ===================== RODAPÉ ===================== */
 .footer{width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);

@@ -21,7 +21,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" type="image/png" href="public/logo-cppem.png" />
-
 </head>
 <body>
 
@@ -334,6 +333,43 @@
           Você está sendo redirecionado para o WhatsApp.
         </p>
       </form>
+    </div>
+  </div>
+
+  <!-- ===================== EXIT POPUP (INTENÇÃO DE SAÍDA) ===================== -->
+  <div class="modal" id="exit-modal" hidden>
+    <div class="modal__overlay" data-close-modal></div>
+    <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="exit-title">
+      <button type="button" class="modal__close" data-close-modal aria-label="Fechar">&times;</button>
+
+      <span class="eyebrow exit__eyebrow">Espera um pouco</span>
+      <h2 class="modal__title" id="exit-title">Não desista do seu sonho de ser <span class="hl">PMPE</span>!</h2>
+      <p class="modal__sub">Inscreva-se abaixo para receber:</p>
+
+      <ul class="exit__benefits">
+        <li>Comunidade com notícias diárias, materiais gratuitos, questões e descontos!</li>
+      </ul>
+
+      <form class="form" id="exit-form" novalidate>
+        <div class="field">
+          <input type="text" id="exit-nome" name="nome" autocomplete="name" placeholder="Nome completo" required />
+          <span class="error" data-error-for="exit-nome"></span>
+        </div>
+        <div class="field">
+          <input type="text" id="exit-telefone" name="telefone" autocomplete="tel" inputmode="tel" placeholder="Seu WhatsApp (com DDD)" required />
+          <span class="error" data-error-for="exit-telefone"></span>
+        </div>
+
+        <button type="submit" class="cta">QUERO ENTRAR NA COMUNIDADE</button>
+
+        <p class="note">Cadastro gratuito • Seus dados estão seguros.</p>
+        <p class="success" id="exit-success" role="status" hidden>
+          ✅ Inscrição confirmada!<br />
+          Você está entrando na comunidade.
+        </p>
+      </form>
+
+      <button type="button" class="exit__decline" data-close-modal data-decline>Não, quero continuar sem ajuda</button>
     </div>
   </div>
 
