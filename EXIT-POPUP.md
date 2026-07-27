@@ -1,6 +1,10 @@
 # Exit Popup (Exit Intent) — PMPE / CPPEM
 
-Documento de arquitetura. Escrito **antes** da implementação, para validação.
+Documento de arquitetura da versão **integrada**, que roda neste site.
+
+> Para instalar o popup em **outro site**, não use este documento — use o kit
+> portátil em [`exit-popup-kit/`](exit-popup-kit/LEIAME.md), que é independente
+> e não depende do CSS nem do modal desta página.
 
 ---
 
@@ -20,7 +24,7 @@ sendo a oferta de vendas. O exit popup só entra em cena quando o visitante já 
 [sub]      Inscreva-se abaixo para receber:
 [benefício] ✓ Comunidade com notícias diárias, materiais gratuitos,
              questões e descontos!
-[form]     Nome completo  ·  Seu WhatsApp (com DDD)
+[form]     Nome completo  ·  E-mail  ·  Seu WhatsApp (com DDD)
 [cta]      QUERO ENTRAR NA COMUNIDADE
 [nota]     Cadastro gratuito • Seus dados estão seguros.
 [recusa]   Não, quero continuar sem ajuda
@@ -32,10 +36,10 @@ sendo a oferta de vendas. O exit popup só entra em cena quando o visitante já 
 
 | # | Decisão | Escolha | Motivo |
 |---|---------|---------|--------|
-| 1 | Campos do formulário | **Nome + WhatsApp** (sem e-mail) | Quem está saindo não tolera 3 campos. 2 campos já sustentam CRM e remarketing. |
+| 1 | Campos do formulário | **Nome + E-mail + WhatsApp** | Começou com 2 campos por atrito. E-mail incluído a pedido, para habilitar nutrição por e-mail além do WhatsApp. |
 | 2 | Back-button trap (mobile) | **Desligado** por padrão, atrás de flag | Gatilho mais eficaz e mais invasivo. Fica pronto para ligar e medir depois. |
 | 3 | Destino da planilha | Aba **`PMPE_COMUNIDADE`** | Separa o funil de comunidade do funil de vendas no relatório. |
-| 4 | Destino do lead | Constante `COMMUNITY_URL` | Link do grupo/canal ainda não existe no projeto. Placeholder com fallback para o WhatsApp atual; troca de 1 linha. |
+| 4 | Destino do lead | Constante `COMMUNITY_URL` | Preenchida com o link do grupo. Fallback para o WhatsApp da equipe se ficar vazia. |
 | 5 | Botão / cores / cards | Reaproveitar `.cta`, `.modal`, `.field`, `.eyebrow` | Zero divergência visual com o site. |
 
 ---
@@ -98,12 +102,35 @@ const ExitIntent = {
 |---|---|---|
 | Desktop | `mouseleave` no `document` | `clientY <= 0` e `!e.relatedTarget` |
 | Mobile | Inatividade | 25s sem `scroll`/`touchstart`/`click`, após 20s na página |
-| Mobile | Scroll-up rápido | subida > 380px em < 500ms, tendo passado de 40% da página |
+| Mobile | *Push* bruto ao topo | ver regra detalhada abaixo |
 | Mobile | Back-button (`pushState`) | **flag OFF** — `ENABLE_BACK_TRAP = false` |
 
 Todos exigem `ARM_DELAY = 8000ms` de permanência mínima na página.
 
 Detecção de plataforma por `matchMedia('(pointer: fine)')`, não por user-agent.
+
+#### O *push* bruto ao topo
+
+Subir rápido não basta — isso disparava em rolagem comum. O gatilho exige o
+**gesto inteiro**: um arremesso longo, contínuo e que termina no início da página.
+
+O detector acumula um "burst" de subida a cada evento de scroll. Ele dispara só
+quando **todas** as condições valem ao mesmo tempo:
+
+| Condição | Valor | Por quê |
+|---|---|---|
+| Distância acumulada | ≥ `1200px` ou 2 telas cheias, o que for maior | Descarta subidas curtas |
+| Velocidade média | ≥ `1.2 px/ms` (~1200 px/s) | Separa arremesso de rolagem deliberada |
+| Posição final | ≤ `200px` do topo | "Foi até o início de uma vez" |
+| Eventos no burst | ≥ 2 | Sem 2 eventos não há intervalo para medir velocidade |
+
+O burst **zera** quando o usuário volta a descer mais de `60px` ou quando passa
+mais de `400ms` sem evento. Descidas menores que `60px` são toleradas: um único
+*layout shift* de imagem carregando não pode matar o gesto inteiro.
+
+A exigência de 2 eventos existe porque, quando o browser entrega o gesto
+coalescido em um evento só, a duração é ~0 e a velocidade tenderia ao infinito —
+fazendo rolagem lenta passar por arremesso. Sem intervalo medido, não dispara.
 
 ### 3.4 Travas de exibição (ordem de avaliação em `fire()`)
 
@@ -120,11 +147,11 @@ chama `disarm()`.
 ### 3.5 Envio
 
 `submitCommunity()` reaproveita a validação existente (`setError` / `clearError`),
-com regra própria: nome ≥ 2 caracteres, telefone ≥ 10 dígitos.
+com regra própria: nome ≥ 2 caracteres, e-mail válido, telefone ≥ 10 dígitos.
 
 ```js
 payload = {
-  nome, telefone,
+  nome, email, telefone,
   origem: "exit_popup_comunidade",
   gatilho: <desktop|inatividade|scroll_up|back>,
   pagina: location.href,
@@ -135,8 +162,13 @@ payload = {
 `POST no-cors` → `SHEET_URL` com `?aba=PMPE_COMUNIDADE` → sucesso → grava
 `cppem_lead_converted` → redireciona para `COMMUNITY_URL` em 700ms.
 
-Mesmo contrato do form atual. **O Apps Script não muda** — ele já lê o parâmetro
-`aba`; basta a aba existir na planilha.
+Mesmo contrato do form atual.
+
+> **Correção.** A primeira versão deste documento afirmava que o Apps Script já
+> lia o parâmetro `aba`. Não lia — usava `getActiveSheet()` e ignorava a query
+> string, de modo que os dois funis cairiam na mesma aba. `google-apps-script.js`
+> foi corrigido para rotear pela aba (criando-a se não existir) e **exige nova
+> implantação** no Google para que a separação passe a valer.
 
 ### 3.6 Tracking (GTM server-side já instalado)
 
@@ -210,9 +242,21 @@ const ENABLE_BACK_TRAP   = false;   // back-button no mobile
 const ARM_DELAY          = 8000;    // ms mínimos na página
 const IDLE_DELAY         = 25000;   // ms de inatividade (mobile)
 const SNOOZE_DAYS        = 3;       // silêncio após fechar/enviar
-const COMMUNITY_URL      = "";      // ← link do grupo. Vazio = usa o WhatsApp atual
+const COMMUNITY_URL      = "...";   // link do grupo. Vazio = usa o WhatsApp da equipe
 const COMMUNITY_SHEET_TAB = "PMPE_COMUNIDADE";
+
+// Gatilho mobile — o "push" bruto ao topo
+const SCROLL_UP_MIN_PX  = 1200;  // subida mínima acumulada, em px
+const SCROLL_UP_MIN_VH  = 2;     // ...ou 2 telas cheias, o que for maior
+const SCROLL_UP_SPEED   = 1.2;   // px/ms médios (~1200 px/s)
+const SCROLL_UP_GAP     = 400;   // ms de pausa que quebram o gesto
+const SCROLL_UP_JITTER  = 60;    // px de descida tolerados sem zerar o gesto
+const SCROLL_UP_TOP     = 200;   // precisa terminar a até 200px do topo
 ```
+
+Para deixar o gatilho de scroll mais difícil ainda, aumente `SCROLL_UP_MIN_PX`
+ou `SCROLL_UP_SPEED`. Para desativá-lo por completo sem mexer na lógica, basta
+um `SCROLL_UP_MIN_PX` absurdo (ex.: `999999`).
 
 Qualquer ajuste de comportamento é uma linha, sem tocar na lógica.
 
@@ -223,7 +267,8 @@ Qualquer ajuste de comportamento é uma linha, sem tocar na lógica.
 - [ ] Desktop: sair com o mouse pelo topo abre o popup **uma vez**
 - [ ] Desktop: não abre nos primeiros 8s
 - [ ] Mobile: 25s parado abre o popup
-- [ ] Mobile: scroll-up rápido abre o popup
+- [ ] Mobile: *push* bruto até o topo abre o popup
+- [ ] Mobile: rolagem normal para cima **não** abre o popup
 - [ ] Popup **não** abre com o modal principal aberto
 - [ ] Fechar e recarregar: não reabre (snooze de 3 dias)
 - [ ] Após converter em qualquer form: nunca mais aparece
@@ -231,7 +276,8 @@ Qualquer ajuste de comportamento é uma linha, sem tocar na lógica.
 - [ ] `Tab` circula dentro do popup (focus trap)
 - [ ] Scroll do body travado com popup aberto, destravado ao fechar
 - [ ] Envio grava na aba `PMPE_COMUNIDADE` e redireciona
-- [ ] Validação de nome e telefone dispara mensagens de erro
+- [ ] Validação de nome, e-mail e telefone dispara mensagens de erro
+- [ ] Nova implantação do Apps Script feita, e a aba `PMPE_COMUNIDADE` recebe de fato
 - [ ] 3 eventos aparecem no preview do GTM
 - [ ] iPhone / Android / 360px de largura sem quebra
 - [ ] `EXIT_POPUP_ENABLED = false` desliga tudo
@@ -240,9 +286,13 @@ Qualquer ajuste de comportamento é uma linha, sem tocar na lógica.
 
 ## 8. Riscos assumidos
 
-- **Exit intent real não existe no mobile.** Inatividade e scroll-up são
+- **Exit intent real não existe no mobile.** Inatividade e *push* ao topo são
   aproximações de comportamento, não leitura de intenção. Parte do tráfego mobile
   não será alcançada — é uma limitação da plataforma, não da implementação.
+- **O gatilho de scroll erra para o lado de não aparecer.** Quando o browser
+  entrega o gesto coalescido num único evento, não há intervalo para medir
+  velocidade e o popup não abre. Preferimos perder a exibição a incomodar quem
+  só estava rolando a página.
 - **Canibalização parcial** do formulário principal é possível. As travas reduzem,
   o tracking mede. Se os números piorarem: `EXIT_POPUP_ENABLED = false`.
 - **Lead de comunidade é mais frio** que lead de vendas. Por isso a aba separada:

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Demo — outro site</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="exit-popup.css" />
+<style>
+  body{margin:0;min-height:250vh;background:#071022;color:#dfe6f5;
+       font-family:Montserrat,sans-serif;padding:4rem 2rem}
+  h1{font-family:"Bebas Neue";font-size:3rem;margin:0}
+  /* TEMA DO SITE B — só variáveis */
+  .xp{
+    --xp-accent:#2E8BE1;
+    --xp-accent-soft:rgba(46,139,225,.16);
+    --xp-accent-line:rgba(46,139,225,.40);
+    --xp-bg:rgba(8,20,40,.94);
+    --xp-cta:linear-gradient(180deg,#2E8BE1,#1B63A8);
+    --xp-cta-shadow:0 12px 34px rgba(46,139,225,.4);
+  }
+</style>
+</head>
+<body>
+  <h1>Site B — tema azul</h1>
+  <p>Role e saia com o mouse pelo topo.</p>
+
+  <!-- ===== EXIT POPUP ===== -->
+  <div class="xp" id="xp-modal" hidden>
+    <div class="xp__overlay" data-xp-close></div>
+    <div class="xp__box" role="dialog" aria-modal="true" aria-labelledby="xp-title">
+      <button type="button" class="xp__close" data-xp-close aria-label="Fechar">&times;</button>
+
+      <span class="xp__eyebrow">Espera um pouco</span>
+      <h2 class="xp__title" id="xp-title">Não desista do seu sonho de ser <span>PMPE</span>!</h2>
+      <p class="xp__sub">Inscreva-se abaixo para receber:</p>
+
+      <ul class="xp__benefits">
+        <li>Comunidade com notícias diárias, materiais gratuitos, questões e descontos!</li>
+      </ul>
+
+      <form class="xp__form" novalidate>
+        <div class="xp__field">
+          <input type="text" name="nome" data-xp-rule="text" data-xp-msg="Informe seu nome completo."
+                 placeholder="Nome completo" autocomplete="name" required />
+          <span class="xp__error"></span>
+        </div>
+        <div class="xp__field">
+          <input type="email" name="email" data-xp-rule="email"
+                 placeholder="E-mail" autocomplete="email" required />
+          <span class="xp__error"></span>
+        </div>
+        <div class="xp__field">
+          <input type="text" name="telefone" data-xp-rule="phone" inputmode="tel"
+                 placeholder="Seu WhatsApp (com DDD)" autocomplete="tel" required />
+          <span class="xp__error"></span>
+        </div>
+
+        <button type="submit" class="xp__cta">Quero entrar na comunidade</button>
+
+        <p class="xp__note">Cadastro gratuito • Seus dados estão seguros.</p>
+        <p class="xp__success" role="status" hidden>✅ Inscrição confirmada!</p>
+      </form>
+
+      <button type="button" class="xp__decline" data-xp-close data-xp-decline>Não, quero continuar sem ajuda</button>
+    </div>
+  </div>
+
+  <script src="exit-popup.js"></script>
+</body>
+</html>

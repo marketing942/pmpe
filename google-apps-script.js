@@ -1,7 +1,14 @@
 function doPost(e) {
   try {
-    const dados    = JSON.parse(e.postData.contents);
-    const planilha = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const dados   = JSON.parse(e.postData.contents);
+    const arquivo = SpreadsheetApp.getActiveSpreadsheet();
+
+    // ?aba=NOME na URL escolhe a aba de destino (ex.: PMPE, PMPE_COMUNIDADE).
+    // Se a aba não existir, é criada. Sem o parâmetro, usa a aba ativa.
+    const aba = (e && e.parameter && e.parameter.aba) ? String(e.parameter.aba).trim() : "";
+    let planilha = aba ? arquivo.getSheetByName(aba) : null;
+    if (aba && !planilha) planilha = arquivo.insertSheet(aba);
+    if (!planilha) planilha = arquivo.getActiveSheet();
 
     if (planilha.getLastRow() === 0) {
       planilha.appendRow(["Data e Hora", "Nome", "E-mail", "Telefone"]);
