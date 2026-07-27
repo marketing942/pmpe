@@ -1141,14 +1141,34 @@ const EXIT_POPUP_ENVIA_LEAD = false;   // true → o popup também vira Lead
 > Isso é **captura de dados**, não evento de Lead — e não há como impedir pelo
 > site sem dar nomes sem significado aos campos.
 
+### Normalização do telefone (E.164)
+
+Verificado no GTM Preview: a PixelX só prefixava `+` ao valor do campo, então
+`81999967415` virava **`+81999967415`** — código do **Japão**. Match avançado do
+Meta e Enhanced Conversions do Google falham calados com isso.
+
+Correção: o site normaliza antes de enviar, e o campo recebeu a classe
+`pxa_mask_phone` do [§6](#6-como-a-pixelx-identifica-os-campos) para que a
+captura por `blur` também pegue o valor já com país.
+
+```js
+lead_phone: toE164(telefone)   // 81999967415 → +5581999967415
+lead_email: email.trim().toLowerCase()
+```
+
+> A máscara só aparece de fato se `phone_mask` estiver configurado no painel
+> ([§6](#6-como-a-pixelx-identifica-os-campos)). Sem isso a classe é inofensiva,
+> e a normalização no `send_event` continua valendo.
+
 ### Verificação automatizada
 
-O comportamento acima é coberto por **20 testes** rodando em Chrome real, com uma
+O comportamento acima é coberto por **25 testes** rodando em Chrome real, com uma
 PixelX falsa que conta cada Lead recebido e um espião no listener do `<form>`
 simulando a regra do painel:
 
 - telefone: rejeita incompleto, rejeita a contagem enganosa do `+55`, aceita
   mascarado / cru / DDD 55, rejeita fixo em modo `celular_br`
+- E.164: adiciona `+55`, não duplica país, preserva DDD 55, vazio segue vazio
 - submit inválido → **zero** Lead, e o evento não chega ao `<form>`
 - submit válido → **exatamente 1** Lead, com nome, e-mail e telefone
 - envio repetido → continua **1** Lead (guarda de idempotência)

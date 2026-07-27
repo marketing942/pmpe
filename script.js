@@ -1,5 +1,5 @@
 /* =========================================================
-   CPPEM — Formulário → Google Sheets + WhatsApp
+   CPPEM · Landing PMPE — Formulário → Google Sheets + WhatsApp
    ========================================================= */
 
 const SHEET_BASE = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec";
@@ -366,6 +366,18 @@ const isPhone = (v) => {
   return d.length === 11 && d[2] === "9";   // celular_br (padrão)
 };
 
+/* Normaliza para E.164 brasileiro: +55 + DDD + número.
+   Meta e Google casam telefone por E.164. Sem o código do país,
+   "81999967415" vira "+81999967415" — que é Japão — e o match falha. */
+function toE164(v) {
+  let d = String(v || "").trim().replace(/^\+\s*55\s*/, "").replace(/\D/g, "");
+
+  // já veio com o país embutido, sem o "+"
+  if (d.length > 11 && d.startsWith("55")) d = d.slice(2);
+
+  return d ? `+55${d}` : "";
+}
+
 /* =========================================================
    Emissor ÚNICO de Lead (§9)
    ========================================================= */
@@ -411,8 +423,8 @@ async function trackLead({ nome, email, telefone }) {
     await window.pixel_x_app.send_event({
       event_name: "Lead",
       lead_name:  nome || "",
-      lead_email: email || "",
-      lead_phone: telefone || ""
+      lead_email: (email || "").trim().toLowerCase(),
+      lead_phone: toE164(telefone)
     });
 
     console.log("[tracking] Lead enviado.");
@@ -467,7 +479,7 @@ async function enviarLead() {
       nome: document.getElementById("nome").value.trim(),
       email: document.getElementById("email").value.trim(),
       telefone: telefoneInput.value.trim(),
-      origem: "pagina_captura_cppem",
+      origem: "pagina_captura_pmpe",
       pagina: window.location.href,
       data_envio: new Date().toISOString()
     };
