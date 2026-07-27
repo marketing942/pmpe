@@ -250,9 +250,38 @@ Eram três Leads por conversão.
 Não é um emissor "novo", e sim todos os anteriores contados em dobro. Ver
 [§3.2](#32-existem-dois-jeitos-de-a-pixelx-entrar-na-página).
 
-### Como isso vira 2× ou 3×
+### ⚠ ANTES de tratar como duplicação: N destinos ≠ N duplicatas
 
-| Combinação ativa | Leads por envio |
+**Este é o erro de diagnóstico mais caro desta doc, e custou uma queda real de
+Lead no PMPE.** Leia antes de desligar qualquer emissor.
+
+Se o container tem **3 tags Meta** (3 pixels, 3 contas de anúncio), então **um
+único** Lead corretamente disparado aparece **3 vezes** — uma por destino. Isso é
+o comportamento desejado, não duplicação. A prova está no pageview: se você vê
+3 pageviews, o container tem 3 destinos, e o Lead *tem que* aparecer 3 vezes
+também.
+
+| O que você observa | Interpretação |
+|---|---|
+| 3 pageviews **e** 3 Leads | ✅ Correto — 3 destinos, 1 conversão cada |
+| 1 pageview **e** 3 Leads | ❌ Duplicação real — 3 emissores para 1 destino |
+| 3 pageviews **e** 6 Leads | ❌ Duplicação real — 2 emissores × 3 destinos |
+| 3 pageviews **e** 0 Leads | ❌ Falha A — nenhum emissor chega aos destinos |
+
+**A regra de diagnóstico:** conte o pageview primeiro. Ele te diz quantos
+destinos existem. Só então divida os Leads por esse número. **Leads ÷ destinos
+tem que dar exatamente 1.**
+
+O contador de `send_event`/`fbq` no código ([§10.3](#103-auditoria-de-emissores-duplicados))
+mede **emissores**, e é cego para destinos. Um `send_event` só, com 3 tags no
+container, produz 3 eventos e está certo.
+
+### Como isso vira duplicação de verdade
+
+Os números abaixo são **por destino**. Multiplique pelo número de tags do
+container para saber o que vai aparecer no relatório.
+
+| Combinação ativa | Leads por envio, por destino |
 |---|---|
 | Regra de submit (só ela) | 1 ✅ |
 | Regra de submit + `send_event` manual | 2 |
@@ -278,10 +307,39 @@ O painel tem a regra de `submit` vinculada ao `id` do form. O site **não** cham
   emitir `submit` nativo. **É o modelo que produz a Falha A.**
 - ❌ Não dá para adicionar guarda de idempotência — você não controla o disparo.
 
-### Modelo B — Lead disparado pelo site (recomendado para replicar)
+### Modelo B — Lead disparado pelo site
 
 A regra de Lead no painel é **desligada**, e o site chama `send_event`
 explicitamente, uma única vez, com guarda.
+
+> ### 🛑 PRÉ-REQUISITO QUE INVALIDA O MODELO B
+>
+> **O Modelo B só funciona se os destinos do Lead forem nativos da PixelX.**
+>
+> Se as conversões são entregues por **tags do GTM** (é o caso das 3 tags Meta do
+> container CPPEM/PMPE), `pixel_x_app.send_event()` **não as aciona**. Ele fala
+> com o backend da PixelX; tag do GTM precisa de **gatilho do GTM**. O evento sai
+> do site, é aceito pela PixelX, e **não chega em nenhum pixel Meta** — some sem
+> erro no console.
+>
+> Pior: no Modelo B a barreira chama `stopImmediatePropagation()` no `submit`,
+> o que **também mata o gatilho de formulário do próprio GTM**. Ou seja, o
+> Modelo B não só deixa de disparar as tags — ele impede que qualquer outra
+> coisa dispare.
+>
+> **Teste de 30 segundos, antes de escolher o Modelo B:**
+>
+> ```js
+> // 1. Quantos destinos existem? (conte os pageviews no Meta/painel)
+> // 2. O send_event chega neles? Rode no console e confira o relatório:
+> window.pixel_x_app.send_event({ event_name: 'Lead', lead_name: 'TESTE MODELO B' });
+> ```
+>
+> Se o evento de teste **não** aparecer nas tags de destino, os destinos são do
+> GTM e **o Modelo B está descartado** — use o Modelo A.
+>
+> Sintoma de quem errou nisto: **pageviews normais e Lead zerado**. Ver
+> [§8.7](#87-modelo-b-silenciando-as-tags-do-gtm).
 
 - ✅ **Resolve a Falha A:** não depende do `id` casar com o painel, nem de existir
   `submit` nativo. Funciona em Elementor, React, formulário AJAX, qualquer coisa —
@@ -545,6 +603,21 @@ Esquecer o primeiro é a causa nº 1 da Falha A.
 > formulário submete nativamente e **a página recarrega com os dados na URL**.
 > No [template portável](#9-template-portável) esse valor aparece uma vez só.
 
+### 🛑 Não remova um id opaco antes de confirmar que ele não é o emissor
+
+Esta tabela manda trocar identificadores copiados de outro site. **Isso é
+verdade para o `id` do `<form>` — mas um id de aparência idêntica, sentado no
+`<button>`, pode ser uma regra de CLIQUE do painel, e aí ele é o emissor real
+do Lead.** Removê-lo zera a conversão.
+
+Foi exatamente o que aconteceu no PMPE ([§8.7](#87-modelo-b-silenciando-as-tags-do-gtm)):
+o id no botão parecia lixo de copy/paste e era a única via que ainda disparava
+as 3 tags Meta.
+
+**Antes de remover:** desligue a regra no painel, **ou** confirme com um lead de
+teste que existe outra via ativa. Regra prática — id opaco no `<form>` costuma
+ser regra de submit; id opaco no `<button>` costuma ser regra de clique.
+
 ### 8.2 O `id` do form precisa existir no painel — e ser único
 
 Duas condições, ambas obrigatórias:
@@ -633,6 +706,47 @@ DDD, com o nono dígito**. Ao replicar, ajuste conforme o site:
 
 A remoção do prefixo `+55` antes de contar continua necessária em todos os casos
 em que a máscara da PixelX estiver ativa.
+
+### 8.7 Modelo B silenciando as tags do GTM
+
+**Caso real, PMPE, com queda de Lead em produção.** Sintoma: pageviews normais
+(3, um por tag Meta) e **Lead zerado nos três**.
+
+Sequência do que aconteceu:
+
+1. O botão de submit carregava um `id` que era o identificador de uma regra de
+   conversão no painel. Era **esse id o emissor real** do Lead — a regra
+   disparava as 3 tags Meta do container.
+2. O `id` parecia lixo de copy/paste (é o id do formulário de outra landing da
+   mesma conta) e foi removido, seguindo [§8.1](#81-valores-que-são-específicos-de-cada-site).
+3. O site estava em `LEAD_MODE = "site"` (Modelo B), então em tese o
+   `send_event()` cobriria o Lead.
+4. **Não cobriu.** O Lead foi a zero.
+
+Por que o `send_event` não cobriu:
+
+- As tags Meta são **tags do GTM**, e tag do GTM só dispara por **gatilho do
+  GTM**. `pixel_x_app.send_event()` conversa com o backend da PixelX e não
+  aciona gatilho nenhum do container.
+- A barreira do Modelo B chama `stopImmediatePropagation()` no `submit`, o que
+  **também mata o gatilho de formulário do GTM** — fechando a última via que
+  ainda poderia disparar as tags.
+- A única via que sobrevivia era o **clique**: `stopImmediatePropagation()` no
+  evento `submit` não afeta listeners de `click`. Por isso a regra vinculada ao
+  `id` do botão funcionava — e por isso removê-la zerou tudo.
+
+**Lições que valem para qualquer replicação:**
+
+| Lição | Consequência prática |
+|---|---|
+| Um `id` que parece hash aleatório pode ser o emissor real | Antes de remover, desligue a regra no painel — ou confirme que existe outra via |
+| `stopImmediatePropagation()` no submit mata gatilho de GTM também | Modelo B é incompatível com destinos que sejam tags do GTM |
+| Clique e submit são vias independentes | Matar o submit não mata o clique, e vice-versa |
+| Pageview normal + Lead zero = emissor cortado | Não é problema de container; é a via de conversão que sumiu |
+
+**Antes de remover qualquer identificador suspeito**, rode o teste de reversão:
+remova, envie um lead de teste, confira o relatório. Se zerar, era emissor —
+devolva e trate no painel primeiro.
 
 ---
 
