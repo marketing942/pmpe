@@ -17,7 +17,7 @@ confirmar** está marcado como tal — não misture os dois ao depurar.
 3. [Arquitetura e loaders](#3-arquitetura-e-loaders)
 4. [Inventário dos 5 emissores de Lead](#4-inventário-dos-5-emissores-de-lead)
 5. [Escolha da arquitetura: Modelo A ou Modelo B](#5-escolha-da-arquitetura-modelo-a-ou-modelo-b)
-6. [Como a PixelX identifica os campos](#6-como-a-pixelx-identifica-os-campos)
+6. [**Nomenclatura canônica** e identificação dos campos](#6-nomenclatura-canônica-e-identificação-dos-campos) ← **comece por aqui ao replicar**
 7. [Defeitos originais corrigidos no CPPEM](#7-defeitos-originais-corrigidos-no-cppem)
 8. [Defeitos de replicação: o que quebra ao copiar](#8-defeitos-de-replicação-o-que-quebra-ao-copiar)
 9. [Template portável](#9-template-portável)
@@ -58,11 +58,16 @@ Outras causas de Falha A, em ordem de frequência — ver [§8](#8-defeitos-de-r
 
 | # | Causa | Seção |
 |---|---|---|
-| 1 | `id` do `<form>` copiado do site anterior | [§8.1](#81-valores-que-são-específicos-de-cada-site) |
-| 2 | Formulário não emite evento `submit` nativo (Elementor, React, AJAX) | [§8.3](#83-formulários-que-não-emitem-submit-nativo) |
-| 3 | `stopImmediatePropagation()` matando submits válidos | [§8.4](#84-a-barreira-de-validação-matando-o-lead) |
-| 4 | `pixel_x_app` ainda não pronto quando o Lead é disparado | [§8.5](#85-corrida-com-o-start-assíncrono) |
-| 5 | Campos sem `name`, PixelX sem dados do lead | [§6](#6-como-a-pixelx-identifica-os-campos) |
+| 1 | 🔴 **Nomenclatura divergente** (`nome` em vez de `lead_name`/`name`, id do painel no botão em vez do `<form>`) | [§6.0](#60--a-nomenclatura-não-é-cosmética--ela-é-o-vínculo) |
+| 2 | `id` do `<form>` copiado do site anterior | [§8.1](#81-valores-que-são-específicos-de-cada-site) |
+| 3 | Formulário não emite evento `submit` nativo (Elementor, React, AJAX) | [§8.3](#83-formulários-que-não-emitem-submit-nativo) |
+| 4 | `stopImmediatePropagation()` matando submits válidos | [§8.4](#84-a-barreira-de-validação-matando-o-lead) |
+| 5 | `pixel_x_app` ainda não pronto quando o Lead é disparado | [§8.5](#85-corrida-com-o-start-assíncrono) |
+| 6 | Campos sem `name`, PixelX sem dados do lead | [§6.1](#61-como-a-pixelx-identifica-os-campos) |
+
+> **Variante que engana:** se o **GTM recebe o Lead mas o Meta não recebe nada**,
+> e a máscara de telefone funciona (prova de que a PixelX carregou), a causa é
+> quase sempre a nº 1 — nomenclatura. Ver [§8.8](#88-caso-manychat-nomenclatura-divergente).
 
 ### Falha B — "o Lead duplica ou triplica"
 
@@ -363,7 +368,119 @@ explicitamente, uma única vez, com guarda.
 
 ---
 
-## 6. Como a PixelX identifica os campos
+## 6. Nomenclatura canônica e identificação dos campos
+
+### 6.0 🔴 A NOMENCLATURA NÃO É COSMÉTICA — ELA É O VÍNCULO
+
+**Leia esta subseção antes de qualquer outra coisa ao replicar.** Ela custou
+5 tentativas de correção na landing ManyChat, todas erradas, porque a
+nomenclatura foi tratada como estilo pessoal de cada arquivo.
+
+Existem **duas coisas diferentes** que dependem dos nomes, e confundi-las é o
+erro:
+
+| | O que faz | Depende de |
+|---|---|---|
+| **Identificação do campo** | captura passiva no `blur` (§13), máscara | keyword *contida* no `name` — flexível |
+| **Vínculo da regra de conversão** | o **Lead** chegar ao Meta | **nomenclatura exata** — rígido |
+
+A segunda linha é a que importa para a conversão, e ela **não** é flexível.
+`nome`, `telefone` e `lead-form` identificam os campos corretamente pelo
+algoritmo de keywords — e ainda assim **o Lead não chega ao Meta**, porque a
+regra do painel não reconhece o formulário.
+
+#### A nomenclatura obrigatória
+
+Copie exatamente. Cada linha foi verificada nas três landings em produção:
+
+| Elemento | Atributo | Valor obrigatório |
+|---|---|---|
+| `<form>` | `id` | o identificador do painel (ex.: `IPEyzyfmJhKQEYIXAlZH`) |
+| `<form>` | `name` | `lead_form` |
+| nome | `id` / `name` | `lead_name` / `name` |
+| e-mail | `id` / `name` | `lead_email` / `email` |
+| telefone | `id` / `name` | `lead_phone` / `phone` |
+| telefone | `class` | `pxa_mask_phone` |
+| botão | `id` | `lead_submit` |
+| spans de erro | `data-error-for` | `name`, `email`, `phone` |
+
+```html
+<form class="form" name="lead_form" id="ID_DO_PAINEL" novalidate>
+  <input type="text"  id="lead_name"  name="name"  required />
+  <span class="error" data-error-for="name"></span>
+
+  <input type="email" id="lead_email" name="email" required />
+  <span class="error" data-error-for="email"></span>
+
+  <input class="pxa_mask_phone" type="text" id="lead_phone" name="phone" required />
+  <span class="error" data-error-for="phone"></span>
+
+  <button type="submit" id="lead_submit" class="cta">ENVIAR</button>
+</form>
+```
+
+#### O identificador do painel vai no `<form>`, não no botão
+
+> Este ponto sozinho consumiu três diagnósticos errados nesta doc.
+
+O `id` do painel pertence ao **`<form>`**. Uma landing chegou a funcionar com
+ele no `<button>`, o que produziu a conclusão errada de que era "regra de
+clique" e de que o valor era intercambiável entre os dois elementos. **Não é.**
+Ao replicar, o padrão é sempre: identificador do painel no `<form>`,
+`lead_submit` no botão.
+
+#### 🔴 O identificador do painel é um `id` — nunca uma `class`
+
+`#eiBtTROiAlNexbHXklSc` e `.eiBtTROiAlNexbHXklSc` são **seletores diferentes**.
+A regra do painel procura o **id**. Colocar o mesmo valor como classe faz o
+vínculo nunca acontecer, e o sintoma é o mais silencioso de todos: **nem o GTM
+nem o Meta recebem Lead — só pageview.**
+
+| Landing | Identificador | Onde | Como |
+|---|---|---|---|
+| captura-cppem | `IPEyzyfmJhKQEYIXAlZH` | `<form>` | `id` ✅ |
+| pmpe | `IPEyzyfmJhKQEYIXAlZH` | `<button>` | `id` ✅ |
+| ManyChat | `IPEyzyfmJhKQEYIXAlZH` | `<form>` | `id` ✅ |
+| Aniversário (antes) | `eiBtTROiAlNexbHXklSc` | `<button>` | **`class`** ❌ |
+
+> Cuidado com a §4, Emissor 2: ela descreve um mecanismo de "conversão por
+> classe" que existiu no CPPEM antigo. **Não confunda os dois.** Se o painel
+> cadastrou o valor como id, ele tem que ser `id` no HTML. Na dúvida, use `id`
+> no `<form>` — é a configuração das três landings que funcionam.
+
+#### 🔴 O identificador precisa ser ESTÁTICO
+
+Nunca adicione ou remova o identificador em runtime. Houve uma tentativa
+engenhosa de só marcar o botão quando o formulário estivesse válido:
+
+```js
+// ERRADO — some do DOM no load e a PixelX nunca vincula
+function syncPixelClass() {
+  btn.classList.toggle(PIXELX_CLASS, isFormValid());
+}
+syncPixelClass();   // formulário vazio → REMOVE o identificador
+```
+
+A PixelX varre o DOM para vincular a regra. Se o identificador não está lá na
+varredura, o vínculo não acontece — e devolvê-lo depois **não vincula
+retroativamente**. O gating de validade se faz com as barreiras de submit
+([§7.8](#78-ordem-de-registro-dos-listeners-de-submit)), não mexendo no
+identificador.
+
+#### Regra prática
+
+> **Se um site funciona e outro não, e a única diferença é nomenclatura, a
+> nomenclatura É a causa.** Não trate `nome` vs `name` como preferência de
+> idioma. Copie o arquivo que funciona e troque só o que é específico do site
+> ([§8.1](#81-valores-que-são-específicos-de-cada-site)) — nunca "adapte" nomes.
+
+Sintoma característico: **GTM recebe o Lead, Meta não recebe nada.** O GTM
+dispara no clique e não valida nomenclatura; a PixelX é quem precisa reconhecer
+o formulário para encaminhar ao Meta. Ver [§8.8](#88-caso-manychat-nomenclatura-divergente).
+
+---
+
+### 6.1 Como a PixelX identifica os campos
 
 Isto define os atributos que o HTML **precisa** ter. De `input_has_type()`:
 
@@ -748,6 +865,151 @@ Por que o `send_event` não cobriu:
 remova, envie um lead de teste, confira o relatório. Se zerar, era emissor —
 devolva e trate no painel primeiro.
 
+#### Refinamento: a causa raiz é a regra por site, não o mecanismo do evento
+
+A primeira leitura deste caso foi "`send_event` não aciona tag do GTM". Isso é
+verdade, mas **não é a causa raiz** — e atribuir o problema a ela leva a
+consertos que não funcionam. O caso da landing ManyChat fechou o diagnóstico:
+
+| Página | Regra de conversão no painel | `id` no botão | Lead chega no Meta |
+|---|---|---|---|
+| captura-cppem | sim | — (id no `<form>`) | ✅ |
+| pmpe | sim | `IPEyzyfmJhKQEYIXAlZH` | ✅ |
+| ManyChat | **não** | `IPEyzyfmJhKQEYIXAlZH` (o mesmo) | ❌ |
+
+O **mesmo id**, no mesmo container, funciona numa página e não na outra. E na
+ManyChat um `dataLayer.push` chega ao GTM e **para ali**, sem seguir para o
+Meta.
+
+**A regra geral, então:**
+
+> A ponte para o Meta é a PixelX, e ela só encaminha a conversão quando existe
+> **regra de conversão cadastrada no painel para aquele site**. Sem a regra, não
+> importa como o evento é produzido — clique, submit, `send_event` ou
+> `dataLayer.push`. O Meta não vê.
+
+Corolários que mudam o diagnóstico:
+
+- **A regra do painel é por site, não global por `id`.** Copiar o identificador
+  de uma landing que funciona para outra **não** replica a conversão.
+- **Nenhuma quantidade de código no site substitui a regra.** Se o painel não
+  cobre o site, a única correção é cadastrá-lo lá.
+- **Evento chegando no GTM e não no Meta = serviço pela metade**, e a metade que
+  falta é sempre painel-side.
+
+Sintoma que identifica este caso: pageview normal, captura passiva funcionando
+(o lead aparece no painel via `blur`, ver [§13](#13-o-que-não-dá-para-controlar-pelo-site)),
+e **evento de conversão zerado**. A captura passiva funcionando engana — ela
+prova que a PixelX carregou, não que existe regra de conversão.
+
+### 8.8 Caso ManyChat: nomenclatura divergente
+
+**O caso mais caro desta doc: 5 tentativas de correção, todas erradas, porque a
+nomenclatura foi tratada como estilo de código.**
+
+Sintoma: o Lead chegava ao **GTM** e **nunca** ao Meta. Pageview normal.
+Máscara de telefone funcionando (portanto a PixelX estava carregada e ativa).
+Captura passiva registrando "subscribed" no painel.
+
+#### As 5 hipóteses erradas, e por que cada uma caiu
+
+| # | Hipótese | Por que caiu |
+|---|---|---|
+| 1 | O `id` do painel no botão era lixo de copy/paste; removê-lo | Zerou o Lead em outra landing. **Era emissor.** |
+| 2 | Domínio não coberto pela regra do painel | Pageview e captura passiva funcionavam no domínio |
+| 3 | `send_event` não aciona tag do GTM → usar `dataLayer.push` | O evento chegou ao GTM e parou ali |
+| 4 | Faltava a classe `pxa_mask_phone` | Foi adicionada; a máscara passou a funcionar e o Lead continuou zerado |
+| 5 | A tag da PixelX não dispara neste hostname | A máscara funcionava, provando que a PixelX **estava** carregada |
+
+#### O que era
+
+A landing usava nomenclatura própria, em português:
+
+```html
+<!-- ERRADO — identifica os campos, mas a regra do painel não reconhece -->
+<form id="lead-form">
+  <input id="nome"     name="nome" />
+  <input id="email"    name="email" />
+  <input id="telefone" name="telefone" class="pxa_mask_phone" />
+  <button type="submit" id="IPEyzyfmJhKQEYIXAlZH">…</button>
+</form>
+```
+
+Todos esses `name` **identificam corretamente** pelo algoritmo de keywords:
+`nome`→name, `telefone`→phone. A captura passiva funcionava. A máscara
+funcionava. E mesmo assim a conversão não era encaminhada ao Meta.
+
+A correção foi espelhar o arquivo que funciona, campo por campo:
+
+```html
+<!-- CERTO — nomenclatura canônica, id do painel no <form> -->
+<form name="lead_form" id="IPEyzyfmJhKQEYIXAlZH">
+  <input id="lead_name"  name="name" />
+  <input id="lead_email" name="email" />
+  <input class="pxa_mask_phone" id="lead_phone" name="phone" />
+  <button type="submit" id="lead_submit">…</button>
+</form>
+```
+
+Funcionou na primeira tentativa.
+
+#### As duas lições
+
+1. **Identificar o campo ≠ vincular a regra de conversão.** O algoritmo de
+   keywords ([§6.1](#61-como-a-pixelx-identifica-os-campos)) resolve o primeiro
+   e não diz nada sobre o segundo. Máscara funcionando **não** é prova de que a
+   conversão está vinculada — só de que a PixelX carregou.
+2. **Comparar é mais barato que inferir.** As 5 hipóteses vieram de raciocínio
+   sobre o mecanismo. O que resolveu foi um diff atributo por atributo entre um
+   site que funciona e um que não. **Faça o diff primeiro.**
+
+#### O procedimento que deveria ter sido o primeiro
+
+Quando um site funciona e outro não, com a mesma stack:
+
+```bash
+# extraia os atributos do <form> dos dois e compare campo a campo:
+#   form.id, form.name, cada input (id/name/class/type), button.id, data-error-for
+# qualquer divergência é suspeita até prova em contrário — inclusive "só o nome"
+```
+
+Não parta para teoria sobre painel, container ou domínio enquanto houver
+**uma única** divergência de nomenclatura entre os dois arquivos.
+
+### 8.9 Caso Aniversário: identificador como `class` e loader duplicado
+
+Sintoma: **nem GTM nem Meta recebiam Lead — só pageview.** Diferente do caso
+ManyChat ([§8.8](#88-caso-manychat-nomenclatura-divergente)), onde o GTM ao
+menos recebia.
+
+Três defeitos somados, todos invisíveis no console:
+
+| # | Defeito | Efeito |
+|---|---|---|
+| 1 | Identificador do painel como **`class`** no botão, não `id` | vínculo nunca acontecia — **causa raiz** |
+| 2 | Identificador **removido no load** por `syncPixelClass()` | mesmo como classe, sumia do DOM antes da varredura |
+| 3 | Loader do GTM **duplicado** (`<head>` + `<body>`) | cada evento contado em dobro, inclusive pageview |
+
+O nº 2 merece atenção porque a intenção era boa: a classe só entrava no botão
+quando o formulário estivesse válido, para não contar conversão de quem clica
+sem preencher. Mas `syncPixelClass()` era chamado no load, com o formulário
+vazio, **removendo o identificador**. Gating de validade se faz com as barreiras
+de submit, nunca mexendo no identificador.
+
+O nº 3 é o inverso dos outros: não zera, **infla**. Vale conferir se as métricas
+históricas deste site estavam dobradas — a queda após a correção é o número
+certo aparecendo, não perda.
+
+#### A lição de método
+
+A causa raiz foi encontrada por uma tabela de quatro linhas comparando **onde** e
+**como** o identificador aparece em cada landing. Não por raciocínio sobre o
+mecanismo. Isso já é a segunda vez na doc: veja também
+[§8.8](#88-caso-manychat-nomenclatura-divergente).
+
+> **Compare mecanicamente antes de teorizar.** É para isso que existe o
+> [validador da §11.1](#111-validador-automático).
+
 ---
 
 ## 9. Template portável
@@ -1059,6 +1321,67 @@ contamina o teste — ver [§13](#13-o-que-não-dá-para-controlar-pelo-site)):
 
 ## 11. Checklist de replicação
 
+### 11.1 Validador automático
+
+Antes de conferir à mão, rode o validador. Ele executa este checklist inteiro e
+aponta o item exato que falhou:
+
+```bash
+node validar-tracking.js <pasta-do-site>
+
+# exemplos
+node validar-tracking.js .
+node validar-tracking.js ../aniversario-captura
+```
+
+Sai com código **0** se tudo passar e **1** se houver falha — dá para usar como
+gate de pre-deploy. São 25 verificações, e **cada uma corresponde a um defeito
+que já zerou ou inflou o Lead em produção**.
+
+Estado atual das landings:
+
+| Site | Resultado |
+|---|---|
+| captura-cppem | 25/25 |
+| ManyChat | 25/25 |
+| Aniversário | 25/25 |
+| pmpe | 17/25 — nomenclatura não-canônica, **mas funcionando** (ver nota abaixo) |
+
+> **Sobre o pmpe:** ele usa `nome`/`email`/`telefone` e tem um `send_event`
+> residual, e mesmo assim entrega o Lead. Está em produção e não deve ser
+> mexido sem necessidade. Mas se um dia parar, **alinhar a nomenclatura é o
+> primeiro passo** — é a divergência conhecida.
+
+O validador cobre: nomenclatura canônica, identificador do painel (existe, é
+`id` e não `class`, é único, é estático), container (1 loader, dentro do
+`<head>`, sem loader direto, `noscript` correto), JavaScript (validação por
+dígitos, sem `reset()`, redirect com espera, duas barreiras, emissor único) e
+consistência JS↔HTML (ids existem, chaves de erro casam, sem acesso nomeado
+`form.<campo>`, `label for=` resolvem).
+
+Ele ignora comentários de HTML e de JS — sem isso, um comentário citando
+`form.reset()` ou um `id` viraria falso-positivo.
+
+### 🔴 0. NOMENCLATURA — faça esta antes de qualquer outra
+
+Copie de um site que funciona e confira **valor por valor**. Divergência aqui
+não dá erro no console: o GTM recebe o Lead e o Meta não recebe nada
+([§6.0](#60--a-nomenclatura-não-é-cosmética--ela-é-o-vínculo), [§8.8](#88-caso-manychat-nomenclatura-divergente)).
+
+- [ ] `<form name="lead_form">` — o `name` existe e é exatamente esse
+- [ ] `<form id="…">` carrega o **identificador do painel** — no `<form>`, **não** no botão
+- [ ] `id="lead_name"` **e** `name="name"`
+- [ ] `id="lead_email"` **e** `name="email"`
+- [ ] `id="lead_phone"` **e** `name="phone"` **e** `class="pxa_mask_phone"`
+- [ ] `<button type="submit" id="lead_submit">`
+- [ ] `data-error-for` = `name`, `email`, `phone` (não `nome`/`telefone`)
+- [ ] O identificador do painel é **`id`**, nunca `class` (`#x` ≠ `.x`)
+- [ ] O identificador é **estático** — nenhum `classList.toggle` sobre ele
+- [ ] O `script.js` referencia **os mesmos** ids e as mesmas chaves de erro
+
+> **Nunca traduza nomes de campo.** `nome`, `telefone` e `lead-form` funcionam
+> para identificação e máscara, e mesmo assim quebram a conversão.
+
 ### A. Trocar (nenhum destes sobrevive ao copiar/colar)
 
 - [ ] `id` do `<form>` — **nos dois lugares**: HTML e `script.js`
@@ -1115,6 +1438,10 @@ contamina o teste — ver [§13](#13-o-que-não-dá-para-controlar-pelo-site)):
 
 | Sintoma | Causa provável | Onde ler |
 |---|---|---|
+| 🔴 **Nem GTM nem Meta recebem Lead; só pageview** | Identificador do painel como `class` em vez de `id`, ou removido do DOM em runtime | [§6.0](#60--a-nomenclatura-não-é-cosmética--ela-é-o-vínculo), [§8.9](#89-caso-aniversário-identificador-como-class-e-loader-duplicado) |
+| Métricas historicamente dobradas | Loader do GTM duplicado (`<head>` + `<body>`) | [§3.2](#32-existem-dois-jeitos-de-a-pixelx-entrar-na-página), [§8.9](#89-caso-aniversário-identificador-como-class-e-loader-duplicado) |
+| 🔴 **Lead chega no GTM, Meta não recebe nada** — e a máscara funciona | **Nomenclatura divergente.** Máscara OK prova que a PixelX carregou, não que a regra está vinculada | [§6.0](#60--a-nomenclatura-não-é-cosmética--ela-é-o-vínculo), [§8.8](#88-caso-manychat-nomenclatura-divergente) |
+| Campos em português (`nome`, `telefone`) e conversão zerada | Idem — identificam pelo keyword, mas não vinculam a regra | [§6.0](#60--a-nomenclatura-não-é-cosmética--ela-é-o-vínculo) |
 | **Só pageview e general event; Lead nunca chega** | `id` do form copiado do site anterior — não existe no painel desta conta | [§8.1](#81-valores-que-são-específicos-de-cada-site) |
 | Idem, e o `id` está correto | Formulário não emite `submit` nativo | [§8.3](#83-formulários-que-não-emitem-submit-nativo) |
 | Idem, e usuário vê mensagem de erro no campo | Validação bloqueando envios legítimos | [§8.4](#84-a-barreira-de-validação-matando-o-lead) |
@@ -1126,7 +1453,7 @@ contamina o teste — ver [§13](#13-o-que-não-dá-para-controlar-pelo-site)):
 | Página recarrega / URL ganha `?name=...` | `form === null` (id trocado só no HTML), ou erro de JS antes do listener | [§8.1](#81-valores-que-são-específicos-de-cada-site) |
 | Sucesso e redirect com campo inválido | `validate()` retornando `true` — quase sempre a contagem do `+55` | [§7.7](#77-validar-o-telefone-pelo-length-da-string--o-erro-mais-traiçoeiro) |
 | Botão some / form fica em branco ao clicar | `id` duplicado entre `<form>` e `<button>` | [§7.1](#71-id-duplicado-entre-o-form-e-o-button) |
-| Máscara não aplica | `name` ausente no input, ou `phone_mask` não configurado no painel | [§6](#6-como-a-pixelx-identifica-os-campos) |
+| Máscara não aplica | `name` ausente no input, ou `phone_mask` não configurado no painel | [§6](#61-como-a-pixelx-identifica-os-campos) |
 | Campo se preenche sozinho | `power_ups.form_auto_fill` — teste em aba anônima | [§13](#13-o-que-não-dá-para-controlar-pelo-site) |
 | Telefone válido é rejeitado | `phoneMode` errado — site aceita fixo ou outro país | [§8.6](#86-a-validação-de-telefone-não-é-universal) |
 | Chegam leads sem envio nenhum | Captura no `blur` — comportamento normal da PixelX, não é Lead | [§13](#13-o-que-não-dá-para-controlar-pelo-site) |
@@ -1195,7 +1522,7 @@ loader direto da PixelX. Ou seja, o site não tinha emissor de Lead algum — o
 único possível era o painel.
 
 E o id opaco `IPEyzyfmJhKQEYIXAlZH` está no **`<button>`**, não no `<form>`
-(o form é `id="lead-form"`). Pelo [§6](#6-como-a-pixelx-identifica-os-campos),
+(o form é `id="lead-form"`). Pelo [§6](#61-como-a-pixelx-identifica-os-campos),
 esse id é o identificador do **formulário** no painel. No botão, uma regra de
 submit não encontra formulário nenhum para vincular — **é a Falha A**, e explica
 o Lead não estar sendo captado.
@@ -1262,7 +1589,7 @@ Verificado no GTM Preview: a PixelX só prefixava `+` ao valor do campo, então
 Meta e Enhanced Conversions do Google falham calados com isso.
 
 Correção: o site normaliza antes de enviar, e o campo recebeu a classe
-`pxa_mask_phone` do [§6](#6-como-a-pixelx-identifica-os-campos) para que a
+`pxa_mask_phone` do [§6](#61-como-a-pixelx-identifica-os-campos) para que a
 captura por `blur` também pegue o valor já com país.
 
 ```js
@@ -1271,7 +1598,7 @@ lead_email: email.trim().toLowerCase()
 ```
 
 > A máscara só aparece de fato se `phone_mask` estiver configurado no painel
-> ([§6](#6-como-a-pixelx-identifica-os-campos)). Sem isso a classe é inofensiva,
+> ([§6](#61-como-a-pixelx-identifica-os-campos)). Sem isso a classe é inofensiva,
 > e a normalização no `send_event` continua valendo.
 
 ### Verificação automatizada

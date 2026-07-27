@@ -24,8 +24,14 @@
     prefix:        "cppem",   // prefixo do storage — troque por site
     endpoint:      "",        // URL que recebe o POST do lead
     redirect:      "",        // destino após o envio (grupo, obrigado, etc.)
+    redirectDelay: 1500,      // ms antes de sair da página; abaixo de ~1s perde evento
     origem:        "exit_popup",  // identifica a origem no seu banco
     eventName:     "exit_popup",  // prefixo dos eventos de dataLayer
+
+    // Impede que regras externas de "conversão ao enviar formulário"
+    // (PixelX, GTM, Meta) contem este cadastro como Lead de venda.
+    // Só desligue se você QUISER que o popup gere Lead.
+    stopSubmitPropagation: true,
 
     // Trava extra: retorne true para impedir o popup.
     // Ex.: outro modal do site já está aberto.
@@ -260,9 +266,22 @@
     return ok;
   }
 
-  /* ===================== envio ===================== */
-  formEl.addEventListener("submit", function (e) {
+  /* ===================== envio =====================
+     Barreira em fase de CAPTURA no document: roda antes de qualquer listener
+     registrado no <form>, inclusive os que ferramentas de tracking (PixelX,
+     GTM, Meta) instalam sozinhas.
+
+     Por que isso importa: este popup capta para uma COMUNIDADE, não é lead de
+     venda. Se o submit propagar, uma regra de "conversão ao enviar formulário"
+     conta o cadastro como Lead e contamina a otimização das campanhas.
+     Com stopImmediatePropagation, nenhuma regra externa alcança este form. */
+  document.addEventListener("submit", function (e) {
+    if (e.target !== formEl) return;
+
     e.preventDefault();
+
+    if (CONFIG.stopSubmitPropagation) e.stopImmediatePropagation();
+
     if (!validate()) return;
 
     var btn = formEl.querySelector("button[type='submit']");
@@ -292,11 +311,12 @@
       snooze();
       track("submit", { trigger: trigger });
 
-      formEl.reset();
+      // Não chamar formEl.reset() aqui: ferramentas de tracking leem os
+      // campos no blur e o reset pode fazê-las gravar valores vazios.
       if (okEl) okEl.hidden = false;
 
       if (CONFIG.redirect) {
-        setTimeout(function () { window.location.href = CONFIG.redirect; }, 700);
+        setTimeout(function () { window.location.href = CONFIG.redirect; }, CONFIG.redirectDelay);
       }
     }).catch(function (err) {
       console.error("[ExitPopup] Erro ao enviar:", err);
@@ -304,7 +324,7 @@
       if (last) setFieldError(last, "Erro ao enviar. Tente novamente.");
       if (btn) { btn.disabled = false; btn.textContent = label; }
     });
-  });
+  }, true);   // <- fase de CAPTURA: sem isto o listener roda depois do <form>
 
   /* ===================== start ===================== */
 

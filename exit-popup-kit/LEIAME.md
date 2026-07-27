@@ -151,6 +151,8 @@ Pronto. Não há passo 5.
 | `armDelay` | `8000` | ms mínimos na página antes de o popup poder aparecer. |
 | `idleDelay` | `25000` | ms de inatividade que disparam o popup no mobile. |
 | `snoozeDays` | `3` | Dias de silêncio depois que a pessoa fecha ou envia. |
+| `redirectDelay` | `1500` | ms antes de sair da página. **Abaixo de ~1s você perde eventos de tracking.** |
+| `stopSubmitPropagation` | `true` | Impede que regras externas contem este cadastro como Lead. Ver seção de tracking. |
 | `scrollUpMinPx` | `1200` | Subida acumulada mínima para valer como arremesso. |
 | `scrollUpMinVh` | `2` | ...ou N telas cheias, o que for maior. |
 | `scrollUpSpeed` | `1.2` | Velocidade média mínima em px/ms (~1200 px/s). |
@@ -275,6 +277,62 @@ principal do site **caiu** no mesmo período. Compare os dois antes de comemorar
 
 ---
 
+## Tracking — leia antes de instalar
+
+Esta é a parte que mais dá problema ao replicar, e o erro é silencioso.
+
+### O popup não deve emitir Lead
+
+Ele capta para uma **comunidade / material gratuito**. Quem entra num grupo tem
+intenção muito menor que quem pede contato comercial. Se o cadastro do popup for
+contado como `Lead`, os dois públicos se misturam e a **otimização das campanhas
+piora** — o algoritmo passa a buscar gente parecida com quem só queria algo grátis.
+
+Por isso o kit já vem com:
+
+```js
+stopSubmitPropagation: true
+```
+
+### Como funciona
+
+O submit é interceptado no `document`, em **fase de captura**:
+
+```js
+document.addEventListener("submit", function (e) {
+  if (e.target !== formEl) return;
+  e.preventDefault();
+  if (CONFIG.stopSubmitPropagation) e.stopImmediatePropagation();
+  ...
+}, true);   // <- a flag de captura é o ponto inteiro
+```
+
+Um listener de captura no `document` roda **sempre** antes de qualquer listener
+registrado no `<form>` — inclusive os que PixelX, GTM, Meta ou o construtor de
+página instalam sozinhos e que você não controla. Com `stopImmediatePropagation()`,
+nenhuma regra de "conversão ao enviar formulário" alcança este formulário.
+
+> ⚠️ **Sem o `true` final, a proteção não existe.** O listener passa a rodar
+> depois dos listeners do `<form>`, e qualquer regra externa já disparou. Esse
+> erro foi cometido neste kit e só apareceu porque um teste registrou um espião
+> no `<form>` para simular a regra do painel.
+
+### Se você QUISER que o popup gere Lead
+
+```js
+stopSubmitPropagation: false
+```
+
+E aí garanta que exista **exatamente um** emissor: ou a regra externa, ou uma
+chamada sua no `then` do envio — nunca as duas.
+
+### Eventos para o GTM
+
+Use `<eventName>_submit` para criar a tag do cadastro na comunidade. **Nunca**
+aponte a tag de `Lead` para ele.
+
+---
+
 ## Testar
 
 No console do navegador:
@@ -309,9 +367,10 @@ Já vem resolvido, não mexa a menos que saiba o que está fazendo:
 
 ## Verificação
 
-Este kit foi testado em Chrome com **25 testes funcionais automatizados**
+Este kit foi testado em Chrome com **28 testes funcionais automatizados**
 (abertura, travas, storage, validação dos 3 tipos de campo, envio, os 3 eventos
-de dataLayer, foco e scroll) e validado visualmente em 1280px e 390px, incluindo
+de dataLayer, foco, scroll, e um espião no `<form>` provando que nenhuma regra
+externa alcança o formulário) e validado visualmente em 1280px e 390px, incluindo
 a troca de tema completa.
 
 A regra do gatilho de scroll tem **13 testes determinísticos** próprios, com
@@ -326,6 +385,8 @@ Checklist ao instalar em um site novo:
 - [ ] Um lead de teste chegou no destino
 - [ ] Os 3 eventos aparecem no preview do GTM
 - [ ] `blockWhen` configurado se o site já tem modal próprio
+- [ ] `stopSubmitPropagation` coerente com a decisão de emitir ou não Lead
+- [ ] Confirmado no preview do GTM que o cadastro **não** dispara a tag de Lead
 - [ ] Testado em 360px de largura
 - [ ] `ESC`, X e overlay fecham
 - [ ] Textos e tema revisados
