@@ -150,11 +150,11 @@ if (js) {
     /setTimeout\([\s\S]{0,160}?location\.href/.test(jsCode),
     "navegar na hora cancela a requisição assíncrona da conversão");
   add("JAVASCRIPT", "barreira de submit em fase de captura",
-    /document\.addEventListener\(\s*\n?\s*"submit"/.test(jsCode), "");
+    /document\.addEventListener\(\s*\n?\s*['"]submit['"]/.test(jsCode), "");
   /* Exige o PADRÃO da barreira (valida + preventDefault), não um listener de
      clique qualquer: modais e menus têm cliques que não são barreira. */
   add("JAVASCRIPT", "barreira de clique em fase de captura",
-    /addEventListener\(\s*\n?\s*"click"[\s\S]{0,300}?validate\(\)[\s\S]{0,160}?preventDefault/.test(jsCode),
+    /addEventListener\(\s*\n?\s*['"]click['"][\s\S]{0,300}?validate\(\)[\s\S]{0,160}?preventDefault/.test(jsCode),
     "esperado: click em captura que chama validate() e dá preventDefault se inválido");
   add("JAVASCRIPT", "emissor único (sem send_event/fbq no site)",
     !/\bsend_event\(|\bfbq\(/.test(jsCode),
