@@ -32,6 +32,42 @@ const COMMUNITY_URL = "https://chat.whatsapp.com/BxOuisctuqV3UWT9ldASe4";
 
 const COMMUNITY_SHEET_URL = `${SHEET_BASE}?aba=${COMMUNITY_SHEET_TAB}`;
 
+/* ---------- UTMs ----------
+   As UTMs só existem na URL do PRIMEIRO acesso. Se a pessoa recarrega, volta
+   pelo histórico, ou o link do anúncio cai numa página que redireciona, o
+   ?utm_source= já não está mais lá na hora do submit — e o lead chegava na
+   planilha sem origem nenhuma. Por isso gravamos assim que a página carrega e
+   lemos do storage no envio (first touch). O try/catch cobre navegador com
+   storage bloqueado (aba anônima, ITP), onde o comportamento volta a ser o
+   antigo em vez de quebrar o formulário. */
+const UTM_CAMPOS = ["utm_source", "utm_campaign"];
+
+(function guardarUTMs() {
+  const qs = new URLSearchParams(window.location.search);
+
+  UTM_CAMPOS.forEach((chave) => {
+    const valor = qs.get(chave);
+    if (!valor) return;
+
+    try {
+      sessionStorage.setItem(chave, valor);
+    } catch (e) {
+      /* storage indisponível: segue sem persistir */
+    }
+  });
+})();
+
+function utm(chave) {
+  const daUrl = new URLSearchParams(window.location.search).get(chave);
+  if (daUrl) return daUrl;
+
+  try {
+    return sessionStorage.getItem(chave) || "";
+  } catch (e) {
+    return "";
+  }
+}
+
 /* =========================================================
    Tracking de Lead — PixelX / GTM   (ver TRACKING.md)
 
@@ -479,9 +515,10 @@ async function enviarLead() {
       nome: document.getElementById("nome").value.trim(),
       email: document.getElementById("email").value.trim(),
       telefone: telefoneInput.value.trim(),
-      origem: "pagina_captura_pmpe",
-      pagina: window.location.href,
-      data_envio: new Date().toISOString()
+      origem: "PMPE",
+      pagina_url: window.location.href,
+      utm_source: utm("utm_source"),
+      utm_campaign: utm("utm_campaign")
     };
 
     try {
@@ -579,10 +616,11 @@ async function enviarComunidade() {
       nome: document.getElementById("exit-nome").value.trim(),
       email: document.getElementById("exit-email").value.trim(),
       telefone: document.getElementById("exit-telefone").value.trim(),
-      origem: "exit_popup_comunidade",
+      origem: "PMPE_COMUNIDADE",
       gatilho: ExitIntent.trigger || "",
-      pagina: window.location.href,
-      data_envio: new Date().toISOString()
+      pagina_url: window.location.href,
+      utm_source: utm("utm_source"),
+      utm_campaign: utm("utm_campaign")
     };
 
     try {
