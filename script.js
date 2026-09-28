@@ -1,714 +1,958 @@
 /* =========================================================
-   CPPEM · Landing PMPE — Formulário → Google Sheets + WhatsApp
+   CPPEM · MENTORIA PMPE — modelos A (pré-edital) e B (edital)
+   ---------------------------------------------------------
+     1. CONFIG      planos, links e datas do edital — ÚNICO lugar
+     2. PLANOS      escreve o CONFIG nos cards e nos CTAs
+     3. ABERTURA    as duas batidas, a trinca e a saída da cena
+     4. FX          faíscas e brasas da hero, em canvas
+     5. PÁGINA      header, progresso, parallax, dock
+     6. REVEAL      entrada ao rolar, corrida, contagem de números
+     7. PEÇAS       plataforma, galeria, estrelas, contagem da prova
+     8. ATMOSFERA   brasas da página
    ========================================================= */
+(function () {
+  "use strict";
 
-const SHEET_BASE = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec";
+  /* =========================================================
+     1 · CONFIG
+     ---------------------------------------------------------
+     Os valores dos planos espelham o Plano de Combate do site
+     (siteCppemNovo/app/plano-de-combate). Mudou lá, muda aqui.
 
-const SHEET_URL = `${SHEET_BASE}?aba=PMPE`;
+     `de` vazio some da tela: um "de/por" inventado seria número
+     falso na cara do comprador. Quando a PROMOÇÃO do Supremo
+     tiver valor cheio de verdade, é só preencher.
+     ========================================================= */
+  var CONFIG = {
+    pagina: "mentoria-pmpe",
+    whats:  "558173105354",
 
-const WHATSAPP_REDIRECT = "https://wa.me/5581973105354?text=Quero%20come%C3%A7ar%20minha%20prepara%C3%A7%C3%A3o%20para%20PMPE!%20%F0%9F%94%A5%F0%9F%92%80";
+    planos: {
+      operacional: {
+        nome: "Plano Operacional",
+        mensal: "R$ 61,00", vista: "R$ 732", de: "",
+        checkout: "https://pxa.cppem.com.br/lt/plano-de-combate-operacional"
+      },
+      tatico: {
+        nome: "Plano Tático",
+        mensal: "R$ 104,02", vista: "R$ 997", de: "",
+        checkout: "https://pxa.cppem.com.br/lt/plano-de-combate-tatico"
+      },
+      supremo: {
+        nome: "Plano Supremo",
+        /* de/por REAL: "de" = o total parcelado (12 × 208,35), "por" = à
+           vista. Se um dia houver preço cheio oficial, ele entra no `de` e
+           a economia/o OFF são recalculados à mão. */
+        mensal: "R$ 208,35", vista: "R$ 1.997", de: "R$ 2.500,20",
+        off: "20% OFF", selo: "Você economiza R$ 503,20",
+        checkout: "https://pxa.cppem.com.br/lt/plano-de-combate-supremo"
+      }
+    },
 
-/* =========================================================
-   Configuração do Exit Popup
-   ========================================================= */
-const EXIT_POPUP_ENABLED  = true;   // kill switch — false desliga tudo
-const ENABLE_BACK_TRAP    = false;  // intercepta o botão "voltar" no mobile
-const ARM_DELAY           = 8000;   // ms mínimos na página antes de armar
-const IDLE_DELAY          = 25000;  // ms de inatividade no mobile
-const SNOOZE_DAYS         = 3;      // dias de silêncio após fechar/enviar
-const COMMUNITY_SHEET_TAB = "PMPE_COMUNIDADE";
-
-/* Gatilho mobile: "push" bruto de volta ao topo.
-   Só dispara no gesto inteiro — arremesso longo, sem pausa, terminando no topo. */
-const SCROLL_UP_MIN_PX  = 1200;  // subida mínima acumulada, em px
-const SCROLL_UP_MIN_VH  = 2;     // ...ou 2 telas cheias, o que for maior
-const SCROLL_UP_SPEED   = 1.2;   // px/ms médios (~1200 px/s) — separa arremesso de rolagem
-const SCROLL_UP_GAP     = 400;   // ms de pausa que quebram o gesto
-const SCROLL_UP_JITTER  = 60;    // px de descida tolerados sem zerar o gesto
-const SCROLL_UP_TOP     = 200;   // precisa terminar a até 200px do topo
-
-// Link do grupo/canal da comunidade. Vazio = cai no WhatsApp da equipe.
-const COMMUNITY_URL = "https://chat.whatsapp.com/BxOuisctuqV3UWT9ldASe4";
-
-const COMMUNITY_SHEET_URL = `${SHEET_BASE}?aba=${COMMUNITY_SHEET_TAB}`;
-
-/* ---------- UTMs ----------
-   As UTMs só existem na URL do PRIMEIRO acesso. Se a pessoa recarrega, volta
-   pelo histórico, ou o link do anúncio cai numa página que redireciona, o
-   ?utm_source= já não está mais lá na hora do submit — e o lead chegava na
-   planilha sem origem nenhuma. Por isso gravamos assim que a página carrega e
-   lemos do storage no envio (first touch). O try/catch cobre navegador com
-   storage bloqueado (aba anônima, ITP), onde o comportamento volta a ser o
-   antigo em vez de quebrar o formulário. */
-const UTM_CAMPOS = ["utm_source", "utm_campaign"];
-
-(function guardarUTMs() {
-  const qs = new URLSearchParams(window.location.search);
-
-  UTM_CAMPOS.forEach((chave) => {
-    const valor = qs.get(chave);
-    if (!valor) return;
-
-    try {
-      sessionStorage.setItem(chave, valor);
-    } catch (e) {
-      /* storage indisponível: segue sem persistir */
+    /* Só o modelo B usa. Texto livre ("12/10 a 10/11") nas datas; a
+       contagem regressiva só aparece com provaISO preenchido
+       (ex.: "2026-12-14T08:00:00-03:00"). */
+    edital: {
+      publicacao: "",
+      inscricoes: "",
+      prova:      "",
+      taf:        "",
+      provaISO:   ""
     }
-  });
-})();
+  };
 
-function utm(chave) {
-  const daUrl = new URLSearchParams(window.location.search).get(chave);
-  if (daUrl) return daUrl;
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* celular e tablet em pé: o MacBook sai e entra o iPhone (cinema). A
+     MESMA consulta está no styles.css — mudou lá, muda aqui. E ela é
+     ouvida ao vivo (DevTools, tablet girando), não decidida uma vez só. */
+  var CINEMA_MQ = window.matchMedia("(max-width: 1024px) and (pointer: coarse), (max-width: 820px)");
+  var raiz = document.documentElement;
+  var modelo = raiz.getAttribute("data-modelo") || "a";
 
-  try {
-    return sessionStorage.getItem(chave) || "";
-  } catch (e) {
-    return "";
-  }
-}
+  function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+  function $$(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
+  function push(dados) { window.dataLayer = window.dataLayer || []; window.dataLayer.push(dados); }
 
-/* =========================================================
-   Tracking de Lead — PixelX / GTM   (ver TRACKING.md)
+  push({ event: "modelo_pagina", pagina: CONFIG.pagina, modelo: modelo });
 
-   REGRA DE OURO: deve existir EXATAMENTE UM emissor de Lead.
-
-   LEAD_MODE = "site"   → Modelo B (§5): o site dispara o Lead.
-     A barreira de submit corta a propagação, então a regra de submit
-     do painel fica inerte e não há como duplicar por ali.
-     ⚠ Uma regra de CLIQUE no painel ainda duplicaria — ver §10.3.
-
-   LEAD_MODE = "painel" → Modelo A: o painel dispara, o site não.
-     Exige que o id do <form> seja o cadastrado no painel.
-   ========================================================= */
-const LEAD_MODE   = "site";        // "site" (Modelo B) | "painel" (Modelo A)
-const PHONE_MODE  = "celular_br";  // "celular_br" | "celular_ou_fixo_br" | "internacional"
-const REDIRECT_DELAY_MS = 1500;    // §7.6 — abaixo de ~1s começa a perder eventos
-const PIXEL_TIMEOUT_MS  = 3000;    // §8.5 — espera o pixel_x_app ficar pronto
-
-/* O popup de saída capta para a COMUNIDADE, não é lead de venda.
-   Mantenha false para não contaminar a otimização das campanhas. */
-const EXIT_POPUP_ENVIA_LEAD = false;
-
-/* --- Elementos --- */
-const form = document.getElementById("lead-form");
-const telefoneInput = document.getElementById("telefone");
-
-/* =========================================================
-   Utilitários — storage tolerante e dataLayer
-   ========================================================= */
-const Store = {
-  get(k)    { try { return localStorage.getItem(k); }   catch (e) { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); }       catch (e) {} },
-  sGet(k)   { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
-  sSet(k, v){ try { sessionStorage.setItem(k, v); }     catch (e) {} }
-};
-
-const KEY_SEEN      = "cppem_exit_seen";
-const KEY_SNOOZE    = "cppem_exit_snooze";
-const KEY_CONVERTED = "cppem_lead_converted";
-
-function track(event, data) {
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push(Object.assign({ event: event }, data || {}));
-}
-
-function markConverted() {
-  Store.set(KEY_CONVERTED, "1");
-}
-
-function snooze() {
-  Store.set(KEY_SNOOZE, String(Date.now() + SNOOZE_DAYS * 86400000));
-}
-
-/* =========================================================
-   ModalManager — dono único do estado dos modais
-   ========================================================= */
-const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-
-const ModalManager = {
-  current: null,      // elemento do modal aberto
-  lastFocused: null,
-
-  isOpen() {
-    return this.current !== null;
-  },
-
-  open(id) {
-    const el = document.getElementById(id);
-    if (!el || this.current === el) return;
-
-    if (this.current) this.close();
-
-    this.lastFocused = document.activeElement;
-    this.current = el;
-
-    el.hidden = false;
-    document.body.style.overflow = "hidden";
-
-    const firstInput = el.querySelector("input");
-    if (firstInput) setTimeout(() => firstInput.focus(), 60);
-  },
-
-  close(method) {
-    const el = this.current;
-    if (!el) return;
-
-    if (el.id === "exit-modal" && !ExitIntent.submitted) {
-      track("exit_popup_close", { trigger: ExitIntent.trigger, method: method || "x" });
-      snooze();
-    }
-
-    el.hidden = true;
-    this.current = null;
-    document.body.style.overflow = "";
-
-    if (this.lastFocused && typeof this.lastFocused.focus === "function") {
-      this.lastFocused.focus();
-    }
-    this.lastFocused = null;
-  },
-
-  // Mantém o Tab preso dentro do modal aberto
-  trapFocus(e) {
-    if (!this.current || e.key !== "Tab") return;
-
-    const box = this.current.querySelector(".modal__box");
-    if (!box) return;
-
-    const items = Array.from(box.querySelectorAll(FOCUSABLE))
-      .filter((n) => !n.disabled && n.offsetParent !== null);
-    if (!items.length) return;
-
-    const first = items[0];
-    const last  = items[items.length - 1];
-
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault();
-      first.focus();
-    }
-  }
-};
-
-document.querySelectorAll("[data-open-modal]").forEach((el) => {
-  el.addEventListener("click", (e) => {
-    e.preventDefault();
-    ModalManager.open("lead-modal");
-  });
-});
-
-document.querySelectorAll("[data-close-modal]").forEach((el) => {
-  el.addEventListener("click", () => {
-    const method = el.hasAttribute("data-decline")        ? "recusa"
-                 : el.classList.contains("modal__overlay") ? "overlay"
-                 : "x";
-    ModalManager.close(method);
-  });
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && ModalManager.isOpen()) {
-    ModalManager.close("esc");
-    return;
-  }
-  ModalManager.trapFocus(e);
-});
-
-/* =========================================================
-   ExitIntent — detecção de intenção de saída
-   ========================================================= */
-const ExitIntent = {
-  armed: false,
-  fired: false,
-  submitted: false,
-  trigger: null,
-  cleanup: [],
-
-  init() {
-    if (!EXIT_POPUP_ENABLED) return;
-    if (!document.getElementById("exit-modal")) return;
-    if (this.isBlocked()) return;
-
-    setTimeout(() => { this.armed = true; }, ARM_DELAY);
-
-    const isDesktop = window.matchMedia("(pointer: fine)").matches;
-    if (isDesktop) this.watchPointer();
-    else this.watchMobile();
-
-    if (ENABLE_BACK_TRAP) this.watchBack();
-  },
-
-  // Travas permanentes, avaliadas uma vez na entrada
-  isBlocked() {
-    if (Store.get(KEY_CONVERTED)) return true;
-    if (Store.sGet(KEY_SEEN)) return true;
-
-    const until = parseInt(Store.get(KEY_SNOOZE) || "0", 10);
-    if (until && Date.now() < until) return true;
-
-    return false;
-  },
-
-  canFire() {
-    return this.armed && !this.fired && !ModalManager.isOpen() && !this.isBlocked();
-  },
-
-  fire(trigger) {
-    if (!this.canFire()) return;
-
-    this.fired = true;
-    this.trigger = trigger;
-    Store.sSet(KEY_SEEN, "1");
-
-    ModalManager.open("exit-modal");
-    track("exit_popup_view", { trigger: trigger });
-
-    this.teardown();
-  },
-
-  on(target, type, handler, opts) {
-    target.addEventListener(type, handler, opts);
-    this.cleanup.push(() => target.removeEventListener(type, handler, opts));
-  },
-
-  teardown() {
-    this.cleanup.forEach((fn) => fn());
-    this.cleanup = [];
-  },
-
-  /* Desktop: cursor saindo pelo topo da viewport */
-  watchPointer() {
-    this.on(document, "mouseout", (e) => {
-      if (!e.relatedTarget && e.clientY <= 0) this.fire("desktop");
+  /* =========================================================
+     2 · PLANOS E CHECKOUT
+     ========================================================= */
+  var UTM = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+  (function guardarUTMs() {
+    var qs = new URLSearchParams(location.search);
+    UTM.forEach(function (k) {
+      var v = qs.get(k);
+      if (v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
     });
-  },
-
-  /* Mobile: inatividade + "push" bruto de volta ao topo
-     Não basta subir rápido. Tem que ser o gesto inteiro:
-     um arremesso longo, contínuo e que termina no início da página. */
-  watchMobile() {
-    let idleTimer = null;
-
-    const resetIdle = () => {
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => this.fire("inatividade"), IDLE_DELAY);
-    };
-
-    let lastY = window.scrollY;
-    let lastT = Date.now();
-    let burstPx = 0;      // quanto já subiu neste arremesso
-    let burstT = 0;       // quando o arremesso começou
-    let burstN = 0;       // quantos eventos compõem o arremesso
-
-    const onScroll = () => {
-      const y = window.scrollY;
-      const t = Date.now();
-      const subiu = lastY - y;
-
-      // Voltou a descer de verdade, ou parou no meio do caminho:
-      // não é mais um gesto único — zera e recomeça a contar deste ponto.
-      // Oscilações pequenas (layout shift de imagem carregando) são ignoradas,
-      // senão um único evento espúrio mataria o arremesso inteiro.
-      if (subiu <= -SCROLL_UP_JITTER) {
-        burstPx = 0;                          // voltou a descer: anula o gesto
-        burstT = t;
-        burstN = 0;
-      } else if (t - lastT > SCROLL_UP_GAP) {
-        burstPx = Math.max(0, subiu);         // gesto novo começa aqui
-        burstT = t;
-        burstN = 1;
-      } else if (subiu > 0) {
-        burstPx += subiu;                     // mesmo gesto, continua somando
-        burstN++;
-      }
-
-      lastY = y;
-      lastT = t;
-
-      const duracao = t - burstT;
-      const distancia = Math.max(SCROLL_UP_MIN_PX, window.innerHeight * SCROLL_UP_MIN_VH);
-
-      // burstN >= 2 é obrigatório: com um único evento a duração é ~0 e a
-      // velocidade daria infinito, deixando passar rolagem lenta que o browser
-      // entregou coalescida. Sem intervalo real medido, não dá para afirmar
-      // que foi um arremesso — e aqui o falso negativo é preferível.
-      if (burstN >= 2 && duracao > 0 &&
-          burstPx >= distancia &&
-          burstPx / duracao >= SCROLL_UP_SPEED &&
-          y <= SCROLL_UP_TOP) {
-        this.fire("scroll_up");
-        return;
-      }
-
-      resetIdle();
-    };
-
-    this.on(window, "scroll", onScroll, { passive: true });
-    this.on(document, "touchstart", resetIdle, { passive: true });
-    this.on(document, "click", resetIdle);
-    this.cleanup.push(() => clearTimeout(idleTimer));
-
-    resetIdle();
-  },
-
-  /* Mobile (opcional): intercepta o primeiro "voltar" */
-  watchBack() {
+  })();
+  function utm(k) {
+    var v = new URLSearchParams(location.search).get(k);
+    if (v) return v;
+    try { return sessionStorage.getItem(k) || ""; } catch (e) { return ""; }
+  }
+  function comUTM(base) {
     try {
-      history.pushState(null, "", location.href);
-    } catch (e) {
-      return;
-    }
+      var u = new URL(base);
+      UTM.forEach(function (k) { var v = utm(k); if (v && !u.searchParams.has(k)) u.searchParams.set(k, v); });
+      /* o modelo segue junto: é assim que o A/B aparece na venda */
+      if (!u.searchParams.has("utm_content") && !utm("utm_content")) u.searchParams.set("utm_content", "mentoria-" + modelo);
+      return u.toString();
+    } catch (e) { return base; }
+  }
 
-    this.on(window, "popstate", () => {
-      if (this.canFire()) {
-        try { history.pushState(null, "", location.href); } catch (e) {}
-        this.fire("back");
+  $$("[data-plano]").forEach(function (card) {
+    var id = card.getAttribute("data-plano");
+    var p = CONFIG.planos[id];
+    if (!p) return;
+    var slot = function (n) { return $('[data-p="' + n + '"]', card); };
+    var mensal = slot("mensal"), vista = slot("vista"), de = slot("de"), selo = slot("selo");
+    if (mensal) mensal.textContent = p.mensal;
+    if (vista) vista.textContent = p.vista;
+    if (de) { de.hidden = !p.de; if (p.de) $("s", de).textContent = p.de; }
+    if (selo) { selo.hidden = !p.selo; if (p.selo) selo.textContent = p.selo; }
+    var off = slot("off");
+    if (off) { off.hidden = !p.off; if (p.off) off.textContent = p.off; }
+
+    var btn = $("[data-checkout]", card);
+    if (!btn) return;
+    btn.href = p.checkout ? comUTM(p.checkout)
+      : "https://wa.me/" + CONFIG.whats + "?text=" + encodeURIComponent("Olá! Quero o " + p.nome + " da Mentoria PMPE.");
+    btn.addEventListener("click", function () {
+      push({ event: "clique_checkout", pagina: CONFIG.pagina, modelo: modelo, plano: id, valor: p.vista });
+    });
+  });
+
+  /* datas do edital (modelo B) */
+  var ed = CONFIG.edital;
+  [["ed-publicacao", ed.publicacao], ["ed-inscricoes", ed.inscricoes], ["ed-prova", ed.prova], ["ed-taf", ed.taf]]
+    .forEach(function (par) { if (par[1]) $$('[data-slot="' + par[0] + '"]').forEach(function (el) { el.textContent = par[1]; }); });
+
+  /* =========================================================
+     3 · A ABERTURA — as duas batidas
+     ---------------------------------------------------------
+     A cena é toda CSS (ver "O TÍTULO" no styles.css). Aqui só:
+       · ouvir o FIM de cada voo (animationend) e soltar, naquele
+         quadro, as faíscas, as brasas e a trinca
+       · destravar a página quando a cena acaba
+       · deixar qualquer toque, tecla ou rolagem pular
+     O instante da batida é ESCUTADO, não calculado: o relógio
+     do CSS e o performance.now() começam em momentos diferentes.
+     ========================================================= */
+  var hero = $(".hero");
+  var tituloM = document.getElementById("tituloM");
+  var tituloP = document.getElementById("tituloP");
+  var comAbertura = raiz.classList.contains("is-abertura");
+  var saiu = false, pulou = false;
+
+  function sairAbertura(porPulo) {
+    if (saiu) return;
+    saiu = true;
+    try { sessionStorage.setItem("mentoria-abertura", "1"); } catch (e) {}
+    raiz.classList.remove("is-entrando");
+    if (porPulo) { pulou = true; raiz.classList.add("is-pulado"); }
+    window.scrollTo(0, 0);
+    ligarObservadores();
+  }
+
+  function centro(el, onde) {
+    var r = el.getBoundingClientRect(), h = hero.getBoundingClientRect();
+    return { x: r.left - h.left + r.width / 2, y: (onde === "topo" ? r.top : r.top + r.height / 2) - h.top, w: r.width, h: r.height };
+  }
+
+  function batida1() {
+    if (pulou || reduced) return;
+    var c = centro(tituloM);
+    trincar(c.x, c.y);
+    FX.estouro(c.x, c.y, { n: 90, vel: [4, 15], ang: [0, 360], vida: [30, 70], viraBrasa: .35 });
+    FX.estouro(c.x - c.w * .42, c.y, { n: 24, vel: [3, 9], ang: [150, 210], vida: [24, 50] });
+    FX.estouro(c.x + c.w * .42, c.y, { n: 24, vel: [3, 9], ang: [-30, 30], vida: [24, 50] });
+  }
+  function batida2() {
+    if (pulou || reduced) return;
+    var c = centro(tituloP, "topo");
+    /* a junção é uma LINHA, não um ponto: as faíscas saem de toda a
+       largura do PMPE, a maioria para cima (o MENTORIA foi empurrado) */
+    FX.linha(c.x - c.w / 2, c.x + c.w / 2, c.y + c.h * .06, { n: 150 });
+    FX.estouro(c.x, c.y, { n: 70, vel: [6, 20], ang: [0, 360], vida: [30, 80], viraBrasa: .5 });
+    FX.onda(90);
+  }
+
+  if (tituloM) tituloM.addEventListener("animationend", function (e) {
+    if (e.target === tituloM && e.animationName === "m-voa") batida1();
+  });
+  if (tituloP) tituloP.addEventListener("animationend", function (e) {
+    if (e.target !== tituloP || e.animationName !== "p-sobe") return;
+    batida2();
+    if (comAbertura) setTimeout(function () { sairAbertura(false); }, 1150);
+  });
+
+  if (comAbertura) {
+    var pular = function () { sairAbertura(true); };
+    var botaoPular = $(".hero__pular");
+    if (botaoPular) botaoPular.addEventListener("click", pular);
+    document.addEventListener("click", pular);
+    window.addEventListener("wheel", pular, { passive: true, once: true });
+    window.addEventListener("touchmove", pular, { passive: true, once: true });
+    document.addEventListener("keydown", function (e) {
+      if (/^(Escape|Enter| |Tab|ArrowDown|PageDown)$/.test(e.key)) pular();
+    });
+    /* rede de segurança: aba em segundo plano não roda animação, e a
+       entrada não pode virar uma parede */
+    setTimeout(pular, 6500);
+  }
+
+  /* ─── a trinca no vidro ─────────────────────────────────────
+     MENTORIA veio de trás de quem assiste: bate na tela por DENTRO. As
+     rachaduras são linhas quebradas saindo do ponto de impacto, com galhos
+     e pedaços de anel ligando uma à outra — é o anel que faz ler "vidro". */
+  function trincar(cx, cy) {
+    var NS = "http://www.w3.org/2000/svg";
+    var W = hero.clientWidth, H = hero.clientHeight;
+    var svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("class", "trinca");
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("aria-hidden", "true");
+    var alcance = Math.max(W, H) * .42;
+    var raios = 11 + Math.floor(Math.random() * 4);
+    var pontas = [];
+
+    function rota(ang, r0, r1, passos) {
+      var d = "", pts = [];
+      for (var i = 0; i <= passos; i++) {
+        var r = r0 + (r1 - r0) * (i / passos);
+        var a = ang + (Math.random() - .5) * .22;
+        var x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
+        pts.push([x, y]);
+        d += (i ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
+      }
+      return { d: d, pts: pts };
+    }
+    function traco(d, fina, atraso) {
+      var p = document.createElementNS(NS, "path");
+      p.setAttribute("d", d);
+      if (fina) p.setAttribute("class", "fina");
+      svg.appendChild(p);
+      return { el: p, atraso: atraso };
+    }
+    var tracos = [];
+    for (var i = 0; i < raios; i++) {
+      var ang = (i / raios) * Math.PI * 2 + (Math.random() - .5) * .35;
+      var r1 = alcance * (.45 + Math.random() * .6);
+      var t = rota(ang, 8 + Math.random() * 16, r1, 7 + Math.floor(Math.random() * 4));
+      pontas.push({ ang: ang, pts: t.pts });
+      tracos.push(traco(t.d, false, Math.random() * .05));
+      /* galho */
+      if (Math.random() < .7) {
+        var base = t.pts[2 + Math.floor(Math.random() * 3)];
+        var ga = ang + (Math.random() < .5 ? -1 : 1) * (.35 + Math.random() * .5);
+        var gd = "M" + base[0].toFixed(1) + " " + base[1].toFixed(1);
+        var gx = base[0], gy = base[1], passo = alcance * (.05 + Math.random() * .05);
+        for (var k = 0; k < 4; k++) { ga += (Math.random() - .5) * .4; gx += Math.cos(ga) * passo; gy += Math.sin(ga) * passo; gd += "L" + gx.toFixed(1) + " " + gy.toFixed(1); }
+        tracos.push(traco(gd, true, .06 + Math.random() * .06));
+      }
+    }
+    /* pedaços de anel: ligam um raio ao vizinho na mesma "volta" */
+    [2, 4].forEach(function (nivel) {
+      for (var j = 0; j < pontas.length; j++) {
+        if (Math.random() < .45) continue;
+        var a = pontas[j].pts[nivel], b = pontas[(j + 1) % pontas.length].pts[nivel];
+        if (!a || !b) continue;
+        var mx = (a[0] + b[0]) / 2 + (Math.random() - .5) * 14, my = (a[1] + b[1]) / 2 + (Math.random() - .5) * 14;
+        tracos.push(traco("M" + a[0].toFixed(1) + " " + a[1].toFixed(1) + "L" + mx.toFixed(1) + " " + my.toFixed(1) + "L" + b[0].toFixed(1) + " " + b[1].toFixed(1), true, .08 + Math.random() * .08));
       }
     });
-  }
-};
-
-/* --- Validação --- */
-function setError(id, msg) {
-  const input = document.getElementById(id);
-  const errorEl = document.querySelector(`[data-error-for="${id}"]`);
-
-  if (input) input.classList.add("is-invalid");
-  if (errorEl) errorEl.textContent = msg;
-}
-
-function clearError(id) {
-  const input = document.getElementById(id);
-  const errorEl = document.querySelector(`[data-error-for="${id}"]`);
-
-  if (input) input.classList.remove("is-invalid");
-  if (errorEl) errorEl.textContent = "";
-}
-
-const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-
-/* §7.7 — conta DÍGITOS, não caracteres, e remove o "+55" da máscara antes de
-   contar, pelo "+" literal. Remover pelos dígitos seria ambíguo: o DDD 55
-   existe (Santa Maria/RS). */
-const isPhone = (v) => {
-  const d = v.trim().replace(/^\+\s*55\s*/, "").replace(/\D/g, "");
-
-  if (PHONE_MODE === "celular_ou_fixo_br") return d.length === 10 || d.length === 11;
-  if (PHONE_MODE === "internacional")      return d.length >= 8 && d.length <= 15;
-
-  return d.length === 11 && d[2] === "9";   // celular_br (padrão)
-};
-
-/* Normaliza para E.164 brasileiro: +55 + DDD + número.
-   Meta e Google casam telefone por E.164. Sem o código do país,
-   "81999967415" vira "+81999967415" — que é Japão — e o match falha. */
-function toE164(v) {
-  let d = String(v || "").trim().replace(/^\+\s*55\s*/, "").replace(/\D/g, "");
-
-  // já veio com o país embutido, sem o "+"
-  if (d.length > 11 && d.startsWith("55")) d = d.slice(2);
-
-  return d ? `+55${d}` : "";
-}
-
-/* =========================================================
-   Emissor ÚNICO de Lead (§9)
-   ========================================================= */
-
-/* §8.5 — pixel_x_app é criado pelo GTM e o start() dela é async. Em conexão
-   lenta o objeto pode não existir na hora do envio; sem esta espera o Lead
-   some sem erro nenhum. */
-function waitForPixel(timeoutMs = PIXEL_TIMEOUT_MS) {
-  return new Promise((resolve) => {
-    const pronto = () => typeof window.pixel_x_app?.send_event === "function";
-
-    if (pronto()) return resolve(true);
-
-    const inicio = Date.now();
-    const t = setInterval(() => {
-      if (pronto()) {
-        clearInterval(t);
-        resolve(true);
-      } else if (Date.now() - inicio > timeoutMs) {
-        clearInterval(t);
-        console.warn("[tracking] pixel_x_app não ficou pronto a tempo; Lead não enviado.");
-        resolve(false);
-      }
-    }, 100);
-  });
-}
-
-/* A guarda cobre duplo clique, listener duplicado e script incluído duas vezes. */
-let leadEnviado = false;
-
-async function trackLead({ nome, email, telefone }) {
-  if (LEAD_MODE !== "site") return false;
-
-  if (leadEnviado) {
-    console.warn("[tracking] Lead já enviado nesta página; ignorando.");
-    return false;
-  }
-  leadEnviado = true;
-
-  if (!(await waitForPixel())) return false;
-
-  try {
-    await window.pixel_x_app.send_event({
-      event_name: "Lead",
-      lead_name:  nome || "",
-      lead_email: (email || "").trim().toLowerCase(),
-      lead_phone: toE164(telefone)
+    hero.appendChild(svg);
+    tracos.forEach(function (t) {
+      var len = t.el.getTotalLength();
+      t.el.style.setProperty("--len", len.toFixed(0));
+      t.el.style.animationDelay = t.atraso.toFixed(3) + "s";
     });
-
-    console.log("[tracking] Lead enviado.");
-    return true;
-  } catch (err) {
-    console.error("[tracking] send_event falhou:", err);
-    leadEnviado = false;          // libera para nova tentativa
-    return false;
-  }
-}
-
-/* Exposto para formulários sem submit nativo (§8.3) e para diagnóstico. */
-window.trackLead = trackLead;
-
-function validate() {
-  let ok = true;
-
-  const nome = document.getElementById("nome")?.value.trim() || "";
-  const email = document.getElementById("email")?.value.trim() || "";
-  const tel = telefoneInput?.value.trim() || "";
-
-  ["nome", "email", "telefone"].forEach(clearError);
-
-  if (nome.length < 2) {
-    setError("nome", "Informe seu nome completo.");
-    ok = false;
+    setTimeout(function () { if (svg.parentNode) svg.parentNode.removeChild(svg); }, 2100);
   }
 
-  if (!isEmail(email)) {
-    setError("email", "Informe um e-mail válido.");
-    ok = false;
-  }
+  /* =========================================================
+     4 · FX — faíscas e brasas da hero
+     ---------------------------------------------------------
+     Um canvas só, composto em `lighter` (luz soma com luz). Duas
+     populações:
+       · BRASAS  sobem devagar, balançando e tremulando, sempre
+       · FAÍSCAS nascem nas batidas, riscam rápido com rastro,
+         freiam, caem — e uma parte VIRA brasa e sobe (viraBrasa)
+     O brilho é um sprite pré-desenhado por cor: shadowBlur por
+     partícula derrubaria o celular. Pausa fora da tela.
+     ========================================================= */
+  var FX = (function () {
+    var cv = document.getElementById("fx");
+    var nada = { estouro: function () {}, linha: function () {}, onda: function () {} };
+    if (!cv || reduced || !cv.getContext) return nada;
+    var ctx = cv.getContext("2d");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = 0, H = 0, vivo = true, ultimo = 0;
+    var CORES = [[255, 240, 205], [240, 220, 176], [201, 174, 122], [230, 150, 80], [196, 112, 63]];
+    var sprites = CORES.map(function (c) {
+      var s = document.createElement("canvas"); s.width = s.height = 64;
+      var g = s.getContext("2d"), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gr.addColorStop(0, "rgba(255,250,235,1)");
+      gr.addColorStop(.18, "rgba(" + c + ",.95)");
+      gr.addColorStop(.45, "rgba(" + c + ",.28)");
+      gr.addColorStop(1, "rgba(" + c + ",0)");
+      g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+      return s;
+    });
+    var brasas = [], faiscas = [];
+    var mobile = window.innerWidth < 640;
+    var BASE = mobile ? 38 : 80;
 
-  if (!isPhone(tel)) {
-    setError("telefone", "Informe seu WhatsApp com DDD.");
-    ok = false;
-  }
-
-  return ok;
-}
-
-/* --- Envio do formulário principal --- */
-async function enviarLead() {
-    const btn = form.querySelector("button[type='submit']");
-
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = "ENVIANDO...";
+    function medir() {
+      W = hero.clientWidth; H = hero.clientHeight;
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+    function novaBrasa(x, y, forte) {
+      return {
+        x: x !== undefined ? x : rnd(0, W), y: y !== undefined ? y : rnd(H * .3, H + 20),
+        vy: -rnd(.25, forte ? 1.6 : .9), vx: rnd(-.15, .15),
+        fase: rnd(0, 6.28), amp: rnd(.2, .8), s: rnd(1.2, forte ? 4 : 3),
+        cor: Math.random() < .38 ? 4 : (Math.random() < .5 ? 2 : 1),
+        vida: 0, max: rnd(260, 620), pisca: rnd(.04, .12)
+      };
+    }
+    for (var i = 0; i < BASE; i++) { var b = novaBrasa(); b.vida = rnd(0, b.max); brasas.push(b); }
 
-    const payload = {
-      nome: document.getElementById("nome").value.trim(),
-      email: document.getElementById("email").value.trim(),
-      telefone: telefoneInput.value.trim(),
-      origem: "PMPE",
-      pagina_url: window.location.href,
-      utm_source: utm("utm_source"),
-      utm_campaign: utm("utm_campaign")
-    };
-
-    try {
-      // 1. Dispara o Lead antes de qualquer coisa que possa tirar o
-      //    visitante da página (§7.6). No modo "painel" isto não faz nada.
-      await trackLead({
-        nome: payload.nome,
-        email: payload.email,
-        telefone: payload.telefone
-      });
-
-      // 2. Envia para o Google Sheets
-      await fetch(SHEET_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      // 3. Mostra sucesso
-      //    §7.6 — NÃO chamar form.reset() aqui: a PixelX lê os campos no blur
-      //    e o reset pode fazê-la gravar valores vazios.
-      markConverted();
-
-      const successEl = document.getElementById("form-success");
-
-      if (successEl) {
-        successEl.hidden = false;
-        successEl.scrollIntoView({
-          behavior: "smooth",
-          block: "center"
+    function estouro(x, y, o) {
+      var n = Math.round(o.n * (mobile ? .55 : 1));
+      for (var i = 0; i < n; i++) {
+        var a = rnd(o.ang[0], o.ang[1]) * Math.PI / 180, v = rnd(o.vel[0], o.vel[1]);
+        faiscas.push({
+          x: x + rnd(-6, 6), y: y + rnd(-6, 6), px: x, py: y,
+          vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+          vida: 0, max: rnd(o.vida[0], o.vida[1]), s: rnd(1, 2.6),
+          cor: Math.floor(rnd(0, 4.99)), vira: Math.random() < (o.viraBrasa || 0)
         });
       }
-
-      // 4. Redireciona para o WhatsApp
-      setTimeout(() => {
-        window.location.href = `${WHATSAPP_REDIRECT}`;
-      }, REDIRECT_DELAY_MS);
-
-    } catch (err) {
-      console.error("[Form] Erro ao enviar:", err);
-
-      setError("telefone", "Erro ao enviar. Tente novamente.");
-
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = "QUERO VESTIR A FARDA";
+    }
+    function linha(x1, x2, y, o) {
+      var n = Math.round(o.n * (mobile ? .55 : 1));
+      for (var i = 0; i < n; i++) {
+        var x = rnd(x1, x2);
+        /* 75% para cima, o resto espirra para baixo; nas pontas, para fora */
+        var ponta = (x - x1) / (x2 - x1);
+        var baseAng = Math.random() < .75 ? -90 : 90;
+        var desvio = (ponta - .5) * 80;
+        var a = (baseAng + desvio + rnd(-35, 35)) * Math.PI / 180, v = rnd(4, 17);
+        faiscas.push({ x: x, y: y, px: x, py: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, vida: 0, max: rnd(26, 70), s: rnd(1, 2.4), cor: Math.floor(rnd(0, 4.99)), vira: Math.random() < .3 });
       }
     }
-}
-
-/* =========================================================
-   Envio do Exit Popup → aba da comunidade
-   ========================================================= */
-const exitForm = document.getElementById("exit-form");
-
-function validateCommunity() {
-  let ok = true;
-
-  const nome = document.getElementById("exit-nome")?.value.trim() || "";
-  const email = document.getElementById("exit-email")?.value.trim() || "";
-  const tel = document.getElementById("exit-telefone")?.value.trim() || "";
-
-  ["exit-nome", "exit-email", "exit-telefone"].forEach(clearError);
-
-  if (nome.length < 2) {
-    setError("exit-nome", "Informe seu nome completo.");
-    ok = false;
-  }
-
-  if (!isEmail(email)) {
-    setError("exit-email", "Informe um e-mail válido.");
-    ok = false;
-  }
-
-  if (!isPhone(tel)) {
-    setError("exit-telefone", "Informe seu WhatsApp com DDD.");
-    ok = false;
-  }
-
-  return ok;
-}
-
-async function enviarComunidade() {
-    const btn = exitForm.querySelector("button[type='submit']");
-
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = "ENVIANDO...";
+    /* depois da 2ª batida o chão da hero solta brasas fortes por um tempo */
+    function onda(n) {
+      for (var i = 0; i < Math.round(n * (mobile ? .5 : 1)); i++) {
+        (function (d) { setTimeout(function () { brasas.push(novaBrasa(rnd(0, W), H + rnd(0, 40), true)); }, d); })(i * 22);
+      }
     }
 
-    const payload = {
-      nome: document.getElementById("exit-nome").value.trim(),
-      email: document.getElementById("exit-email").value.trim(),
-      telefone: document.getElementById("exit-telefone").value.trim(),
-      origem: "PMPE_COMUNIDADE",
-      gatilho: ExitIntent.trigger || "",
-      pagina_url: window.location.href,
-      utm_source: utm("utm_source"),
-      utm_campaign: utm("utm_campaign")
-    };
+    function quadro(ts) {
+      if (!vivo) { ultimo = 0; return; }
+      var dt = ultimo ? Math.min((ts - ultimo) / 16.67, 3) : 1; ultimo = ts;
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalCompositeOperation = "lighter";
 
+      /* faíscas: rastro em linha + cabeça em sprite */
+      for (var i = faiscas.length - 1; i >= 0; i--) {
+        var f = faiscas[i];
+        f.px = f.x; f.py = f.y;
+        f.vx *= Math.pow(.94, dt); f.vy = f.vy * Math.pow(.94, dt) + .16 * dt;
+        f.x += f.vx * dt; f.y += f.vy * dt; f.vida += dt;
+        var k = 1 - f.vida / f.max;
+        if (k <= 0) {
+          if (f.vira) { var nb = novaBrasa(f.x, f.y, true); nb.max = rnd(120, 260); brasas.push(nb); }
+          faiscas.splice(i, 1); continue;
+        }
+        var c = CORES[f.cor];
+        ctx.strokeStyle = "rgba(" + c + "," + (k * .9).toFixed(3) + ")";
+        ctx.lineWidth = f.s * k + .3;
+        ctx.beginPath(); ctx.moveTo(f.x - f.vx * 2.2, f.y - f.vy * 2.2); ctx.lineTo(f.x, f.y); ctx.stroke();
+        var t = f.s * 7 * (.5 + k * .5);
+        ctx.globalAlpha = k; ctx.drawImage(sprites[f.cor], f.x - t / 2, f.y - t / 2, t, t); ctx.globalAlpha = 1;
+      }
+
+      /* brasas */
+      for (var j = brasas.length - 1; j >= 0; j--) {
+        var b = brasas[j];
+        b.vida += dt; b.fase += .03 * dt;
+        b.x += (b.vx + Math.sin(b.fase) * b.amp * .5) * dt; b.y += b.vy * dt;
+        var p = b.vida / b.max;
+        if (p >= 1 || b.y < -20) {
+          if (brasas.length > BASE) { brasas.splice(j, 1); continue; }
+          brasas[j] = novaBrasa(undefined, H + 10); continue;
+        }
+        var a = Math.sin(p * Math.PI) * (.55 + Math.sin(b.vida * b.pisca * 6) * .35);
+        var tam = b.s * 6;
+        ctx.globalAlpha = Math.max(0, a);
+        ctx.drawImage(sprites[b.cor], b.x - tam / 2, b.y - tam / 2, tam, tam);
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(quadro);
+    }
+
+    medir();
+    window.addEventListener("resize", medir, { passive: true });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) {
+        var v = en[0].isIntersecting;
+        if (v && !vivo) { vivo = true; requestAnimationFrame(quadro); } else if (!v) vivo = false;
+      }).observe(hero);
+    }
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) vivo = false; else if (!vivo) { vivo = true; requestAnimationFrame(quadro); }
+    });
+    requestAnimationFrame(quadro);
+    return { estouro: estouro, linha: linha, onda: onda };
+  })();
+
+  /* =========================================================
+     5 · HEADER, PROGRESSO, PARALLAX E DOCK
+     ========================================================= */
+  var header = document.getElementById("header");
+  var progress = document.getElementById("progress");
+  var heroBg = document.getElementById("heroBg");
+  var tropaFoto = document.getElementById("tropaFoto");
+  var dock = document.getElementById("dock");
+  var whats = document.getElementById("whats");
+  var ticking = false;
+
+  function render() {
+    var y = window.scrollY, h = window.innerHeight;
+    if (header) header.classList.toggle("is-stuck", y > 40);
+    if (progress) {
+      var max = document.documentElement.scrollHeight - h;
+      progress.style.width = (max > 0 ? (y / max) * 100 : 0) + "%";
+    }
+    progressoLaptop(h);
+    atualizarCinema(h);
+    var passouHero = y > h * .85;
+    if (dock) dock.classList.toggle("is-on", passouHero);
+    if (whats) whats.classList.toggle("is-on", passouHero);
+    if (!reduced) {
+      if (heroBg && y < h * 1.2) heroBg.style.transform = "translate3d(0," + (y * .16).toFixed(1) + "px,0)";
+      if (tropaFoto) {
+        var r = tropaFoto.parentNode.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < h) tropaFoto.style.transform = "translate3d(0," + (r.top * -.12).toFixed(1) + "px,0)";
+      }
+    }
+    ticking = false;
+  }
+  /* ─── o notebook da missão ─────────────────────────────────
+     O progresso começa quando o trilho está no meio da tela e fecha
+     em 45% da fase presa (sticky). O notebook LIGA já em 15% dela: o
+     vídeo começa enquanto ele ainda vem para a frente. */
+  var trilho = document.getElementById("missaoTrilho");
+  var cena = trilho ? $(".missao__cena", trilho) : null;
+  var laptop = document.getElementById("laptop");
+  var player = laptop ? $(".laptop__player", laptop) : null;
+  var preparado = false, pronto = false, segurou = false, ligou = false;
+  var comSom = false, somPendente = false, pausadoPorNos = false, pessoaPausou = false;
+  var estado = { paused: true, muted: true };
+
+  /* A Panda aceita comandos por postMessage (play, pause, volume,
+     currentTime) e responde com eventos { message: "panda_..." }. */
+  function comando(msg) {
+    if (!player || !player.contentWindow) return;
+    try { player.contentWindow.postMessage(msg, "*"); } catch (e) {}
+  }
+
+  /* ─── pré-carga ───
+     O player leva alguns segundos para carregar: se o src só entrasse na
+     hora de ligar, a pessoa já teria rolado para fora quando o vídeo
+     aparecesse. Então ele carrega ANTES, escondido atrás da tela
+     desligada.
+     ⚠️ autoplay=true é OBRIGATÓRIO aqui: sem ele a Panda ignora o
+     muted=true, e um play sem mudo (sem interação) é bloqueado inteiro
+     pelo navegador. Então ele nasce tocando mudo — e no primeiro sinal de
+     vida o script pausa e volta ao zero ("segurar"). Ligar vira só um
+     play num player pronto: instantâneo.
+     Os demais parâmetros: sem a barra de progresso fictícia (a vermelha)
+     e com a cor do player no ouro da página. A URL tem prioridade sobre o
+     painel da Panda. */
+  function prepararPlayer() {
+    if (preparado || !player) return;
+    preparado = true;
     try {
-      await fetch(COMMUNITY_SHEET_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      });
+      var u = new URL(player.getAttribute("data-video-url"));
+      u.searchParams.set("autoplay", "true");
+      u.searchParams.set("muted", "true");
+      u.searchParams.set("alternativeProgress", "false");
+      u.searchParams.set("controls", "play-large,play,volume,fullscreen");
+      u.searchParams.set("color", "#AF9256");
+      u.searchParams.set("controlsColor", "#F0DCB0");
+      u.searchParams.set("preload", "true");
+      player.src = u.toString();
+    } catch (e) {}
+    /* rede de segurança: se o panda_ready não vier, o load libera */
+    player.addEventListener("load", function () {
+      setTimeout(function () { if (!pronto) { pronto = true; aoFicarPronto(); } }, 2500);
+    });
+  }
 
-      ExitIntent.submitted = true;
-      markConverted();          // §7.6 — sem reset() antes do redirecionamento
-      snooze();
-      track("exit_popup_submit", { trigger: ExitIntent.trigger });
+  function segurar() {
+    if (segurou || ligou) return;
+    segurou = true;
+    comando({ type: "pause" });
+    comando({ type: "currentTime", parameter: 0 });
+  }
+  function aoFicarPronto() {
+    if (somPendente) ligarSom();
+    else if (ligou) tocar();
+  }
 
-      const successEl = document.getElementById("exit-success");
-      if (successEl) successEl.hidden = false;
+  /* play por comando, conferido pelo estado que o player devolve: se ainda
+     estiver parado (o vídeo montando), tenta de novo. */
+  function tocar() {
+    if (!pronto) return;
+    var tentativas = 0;
+    (function tenta() {
+      if (pessoaPausou || tentativas++ > 6) return;
+      if (comSom) comando({ type: "volume", parameter: 1 });
+      if (estado.paused) comando({ type: "play" });
+      setTimeout(function () { if (estado.paused) tenta(); }, 500);
+    })();
+  }
 
-      setTimeout(() => {
-        window.location.href = COMMUNITY_URL || WHATSAPP_REDIRECT;
-      }, REDIRECT_DELAY_MS);
+  function ligarSom() {
+    if (!ligou) return;
+    if (!pronto) { somPendente = true; return; }
+    somPendente = false;
+    comSom = true;
+    laptop.classList.remove("is-mudo");
+    comando({ type: "volume", parameter: 1 });
+    if (estado.paused && !pessoaPausou) comando({ type: "play" });
+    push({ event: "mission_video_sound_on", pagina: CONFIG.pagina, modelo: modelo });
+  }
 
-    } catch (err) {
-      console.error("[ExitPopup] Erro ao enviar:", err);
+  function ligarLaptop(gatilho) {
+    if (ligou || !laptop || !player) return;
+    ligou = true;
+    prepararPlayer();
+    /* SOM: navegador nenhum deixa tocar com som antes de a pessoa
+       interagir com a página (clique, toque ou tecla — rolar NÃO conta).
+         · já houve interação ("Pular" da abertura, toque na tela...):
+           toca e já manda volume 1
+         · não houve: toca mudo, e o primeiro toque/clique/tecla em
+           QUALQUER ponto da página manda volume 1 (ver "primeira
+           interação") — o som entra sem reiniciar o vídeo */
+    comSom = gatilho === "clique" ||
+      !!(navigator.userActivation && navigator.userActivation.hasBeenActive);
+    if (segurou) comando({ type: "currentTime", parameter: 0 });
+    tocar();
+    laptop.classList.toggle("is-mudo", !comSom);
+    laptop.classList.add("is-on");
+    trilho.parentNode.classList.add("is-on");
+    push({ event: "mission_video_started", pagina: CONFIG.pagina, modelo: modelo, trigger: gatilho, som: comSom });
+  }
+  var botaoOff = document.getElementById("laptopOff");
+  if (botaoOff) botaoOff.addEventListener("click", function () { ligarLaptop("clique"); });
+  var botaoSom = document.getElementById("laptopSom");
+  if (botaoSom) botaoSom.addEventListener("click", function () { ligarSom(); });
 
-      setError("exit-telefone", "Erro ao enviar. Tente novamente.");
-
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = "QUERO ENTRAR NA COMUNIDADE";
+  /* ─── o que o player conta ───
+     panda_ready          pronto para receber comando
+     panda_allData        o estado (paused, muted) — é por ele que o
+                          tocar() sabe se precisa insistir
+     panda_play / _pause  quem pausou: nós (saiu da tela) ou a pessoa */
+  window.addEventListener("message", function (e) {
+    if (!player || e.source !== player.contentWindow) return;
+    var d = e.data;
+    if (typeof d === "string") { try { d = JSON.parse(d); } catch (x) { d = { message: d }; } }
+    if (!d) return;
+    var msg = d.message || d.type || "";
+    if (d.playerData) {
+      estado.paused = !!d.playerData.paused;
+      estado.muted = !!d.playerData.muted;
+      /* a pessoa ligou o som pelos controles da própria Panda */
+      if (ligou && !estado.paused && !estado.muted && !comSom) {
+        comSom = true;
+        laptop.classList.remove("is-mudo");
       }
     }
-}
-
-/* =========================================================
-   Barreira única de submit (§7.8)
-
-   Captura no DOCUMENT, em fase de captura: roda SEMPRE antes de qualquer
-   listener registrado no <form>, independente de quem registrou primeiro
-   (a PixelX registra o dela de dentro de um start() async).
-
-   É este bloco que garante "exatamente um emissor":
-   · inválido            → o evento morre aqui, a PixelX não vê nada
-   · válido, modo "site" → morre aqui também; quem dispara o Lead somos nós
-   · válido, modo painel → propaga, e só a regra do painel dispara
-   · popup de saída      → nunca propaga (não é lead de venda)
-   ========================================================= */
-document.addEventListener("submit", (e) => {
-  /* --- Formulário principal: este SIM é Lead --- */
-  if (form && e.target === form) {
-    e.preventDefault();                 // nunca recarregar a página
-
-    if (!validate()) {
-      e.stopImmediatePropagation();     // inválido → nenhum Lead
-      return;
+    if (/panda_ready/i.test(msg) && !pronto) { pronto = true; aoFicarPronto(); }
+    if (/panda_play$/i.test(msg) || /panda_timeupdate/i.test(msg)) {
+      estado.paused = false;
+      if (!ligou) segurar();
+      else if (!pausadoPorNos) pessoaPausou = false;
     }
+    if (/panda_pause$/i.test(msg)) {
+      estado.paused = true;
+      if (ligou && !pausadoPorNos) pessoaPausou = true;
+    }
+  });
 
-    if (LEAD_MODE === "site") e.stopImmediatePropagation();
+  /* ─── primeira interação ───
+     Clique ou toque em qualquer lugar da página (dentro do player quem
+     cuida é a própria Panda) ou tecla: libera o som. Um toque que vira
+     rolagem não conta para o navegador, então esperamos o fim do toque
+     (touchend) e não o começo. */
+  ["click", "touchend", "keydown"].forEach(function (tipo) {
+    document.addEventListener(tipo, function () { if (ligou && !comSom) ligarSom(); }, { capture: true, passive: true });
+  });
 
-    enviarLead();
-    return;
+  /* ─── saiu do notebook: pausa; voltou: continua ───
+     Só retoma o que NÓS pausamos. */
+  if (laptop && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (en) {
+      if (!ligou || !pronto) return;
+      var visivel = en[0].intersectionRatio >= .25;
+      if (!visivel && !pessoaPausou && !estado.paused) { pausadoPorNos = true; comando({ type: "pause" }); }
+      else if (visivel && pausadoPorNos) {
+        comando({ type: "play" });
+        setTimeout(function () { pausadoPorNos = false; }, 600);
+      }
+    }, { threshold: [0, .25, .5] }).observe(laptop);
   }
 
-  /* --- Popup de saída: comunidade, não é lead de venda --- */
-  if (exitForm && e.target === exitForm) {
-    e.preventDefault();
+  function progressoLaptop(h) {
+    if (!trilho || !cena || CINEMA_MQ.matches) return;
+    var r = trilho.getBoundingClientRect();
+    /* começa a carregar o player com a seção ainda a duas telas de distância */
+    if (r.top < h * 2.5 && r.bottom > -h) prepararPlayer();
+    if (r.bottom < 0 || r.top > h) return;
+    var navH = header ? header.offsetHeight : 70;
+    var fasePresa = r.height - cena.offsetHeight;
+    var inicio = h * .5, fim = navH - fasePresa * .45;
+    var p = Math.min(1, Math.max(0, (inicio - r.top) / (inicio - fim)));
+    if (!reduced) cena.style.setProperty("--p", p.toFixed(4));
+    if (p >= .15 || (reduced && r.top < h * .7)) ligarLaptop("scroll");
+  }
 
-    if (!validateCommunity()) {
-      e.stopImmediatePropagation();
+  /* ─── o cinema mobile ──────────────────────────────────────
+     O iPhone cresce com a rolagem até ocupar a tela inteira (a moldura
+     some no caminho). O vídeo liga sozinho, MUDO, quando o cinema entra
+     na tela — é o único play que o celular aceita sem toque. Por cima,
+     conforme o estado REAL do player (postMessage da Panda):
+       · travado (2,5s ligado sem tocar: modo economia, dados...) →
+         "Toque para assistir"
+       · tocando mudo → "Toque para ouvir"
+     O toque manda volume 1 + play e abre em tela cheia: de verdade no
+     Android (girando para horizontal); no iPhone, que não deixa página
+     abrir tela cheia fora do vídeo, rola até o cinema 100% aberto. Se o
+     aparelho recusar mesmo assim, o nosso botão sai da frente e o play da
+     própria Panda fica ao alcance — toque DENTRO do player sempre vale. */
+  var cinema = document.getElementById("cinema");
+  var phone = document.getElementById("phone");
+  var phoneTela = phone ? $(".phone__tela", phone) : null;
+  var phoneIframe = phone ? $(".phone__player", phone) : null;
+  var phoneEstado = { tocando: false, mudo: true, ligouEm: 0 };
+  var phoneLigou = false, phoneTocou = false, phoneQuerSom = false;
+
+  function limita(v) { return Math.min(1, Math.max(0, v)); }
+  function suave(v) { return v * v * (3 - 2 * v); }
+  function mistura(a, b, t) { return a + (b - a) * t; }
+  function phoneComando(msg) {
+    if (!phoneIframe || !phoneIframe.contentWindow) return;
+    try { phoneIframe.contentWindow.postMessage(msg, "*"); } catch (e) {}
+  }
+
+  function ligarPhone(gatilho) {
+    if (phoneLigou || !phone || !phoneIframe) return;
+    phoneLigou = true;
+    try {
+      var u = new URL(phoneIframe.getAttribute("data-video-url"));
+      u.searchParams.set("autoplay", "true");
+      u.searchParams.set("muted", "true");
+      u.searchParams.set("alternativeProgress", "false");
+      u.searchParams.set("controls", "play-large,play,volume,fullscreen");
+      u.searchParams.set("color", "#AF9256");
+      u.searchParams.set("controlsColor", "#F0DCB0");
+      u.searchParams.set("preload", "true");
+      phoneIframe.src = u.toString();
+    } catch (e) {}
+    phone.classList.add("is-on");
+    push({ event: "mission_video_started", pagina: CONFIG.pagina, modelo: modelo, trigger: gatilho, device: "mobile" });
+  }
+
+  function estadoPhone() {
+    if (!phone) return;
+    var on = phone.classList.contains("is-on");
+    if (on && !phoneEstado.ligouEm) phoneEstado.ligouEm = Date.now();
+    var travado = on && !phoneTocou && !phoneEstado.tocando && Date.now() - phoneEstado.ligouEm > 2500;
+    var mudo = on && !phoneTocou && phoneEstado.tocando && phoneEstado.mudo;
+    phone.classList.toggle("is-travado", !!travado);
+    phone.classList.toggle("is-mudo", !!mudo && !travado);
+  }
+
+  window.addEventListener("message", function (e) {
+    if (!phoneIframe || e.source !== phoneIframe.contentWindow) return;
+    var d = e.data;
+    if (typeof d === "string") { try { d = JSON.parse(d); } catch (x) { d = { message: d }; } }
+    if (!d) return;
+    var msg = d.message || d.type || "";
+    if (d.playerData) { phoneEstado.tocando = !d.playerData.paused; phoneEstado.mudo = !!d.playerData.muted; }
+    if (/panda_play$|panda_timeupdate/i.test(msg)) phoneEstado.tocando = true;
+    if (/panda_pause$|panda_ended/i.test(msg)) phoneEstado.tocando = false;
+    /* tocou antes de o player carregar: repete o pedido quando ele fica pronto */
+    if (phoneQuerSom && /panda_ready|panda_canplay/i.test(msg)) {
+      phoneComando({ type: "volume", parameter: 1 });
+      phoneComando({ type: "play" });
+    }
+    estadoPhone();
+  });
+  if (phone) setInterval(estadoPhone, 700);
+
+  function abrirTelaCheia() {
+    var pode = (document.fullscreenEnabled || document.webkitFullscreenEnabled) &&
+      (phoneTela.requestFullscreen || phoneTela.webkitRequestFullscreen);
+    if (pode) {
+      var pedido = phoneTela.requestFullscreen ? phoneTela.requestFullscreen({ navigationUI: "hide" }) : phoneTela.webkitRequestFullscreen();
+      Promise.resolve(pedido).then(function () {
+        if (screen.orientation && screen.orientation.lock) return screen.orientation.lock("landscape");
+      }).catch(function () {});
+      return "fullscreen";
+    }
+    var r = cinema.getBoundingClientRect();
+    var dist = Math.max(1, r.height - window.innerHeight);
+    window.scrollTo({ top: window.scrollY + r.top + dist * .62, behavior: "smooth" });
+    return "cinema";
+  }
+  document.addEventListener("fullscreenchange", function () {
+    if (!document.fullscreenElement && screen.orientation && screen.orientation.unlock) {
+      try { screen.orientation.unlock(); } catch (e) {}
+    }
+  });
+
+  function tocarComSom() {
+    var estavaTravado = !phoneEstado.tocando;
+    phoneTocou = true;
+    phoneQuerSom = true;
+    ligarPhone("clique");
+    phoneComando({ type: "volume", parameter: 1 });
+    phoneComando({ type: "play" });
+    var modo = abrirTelaCheia();
+    estadoPhone();
+    push({ event: "mission_video_tap", pagina: CONFIG.pagina, modelo: modelo, device: "mobile", modo: modo, travado: estavaTravado });
+  }
+  ["phoneTap", "phoneOff"].forEach(function (id) {
+    var b = document.getElementById(id);
+    if (b) b.addEventListener("click", tocarComSom);
+  });
+
+  function atualizarCinema(h) {
+    if (!cinema || !phone) return;
+    if (!CINEMA_MQ.matches) { document.body.classList.remove("cinema-ativo"); return; }
+    var r = cinema.getBoundingClientRect(), vw = window.innerWidth;
+    var prog = limita(-r.top / Math.max(1, r.height - h));
+    var x = reduced ? (prog > .08 ? 1 : 0) : suave(limita((prog - .08) / .48));
+
+    var baseL = Math.min(vw * .76, 360), baseA = baseL / (676 / 1380);
+    if (baseA > h * .76) { baseA = h * .76; baseL = baseA * (676 / 1380); }
+    var l = mistura(baseL, vw, x), a = mistura(baseA, h, x);
+    phone.style.width = l + "px";
+    phone.style.height = a + "px";
+    phone.style.setProperty("--x", x.toFixed(4));
+    phone.style.setProperty("--moldura", limita(x * 1.45).toFixed(4));
+    if (phoneTela && !document.fullscreenElement) {
+      var ix = mistura(l * .0355, 0, x);
+      phoneTela.style.left = ix + "px";
+      phoneTela.style.right = ix + "px";
+      phoneTela.style.top = mistura(a * .018, 0, x) + "px";
+      phoneTela.style.bottom = mistura(a * .019, 0, x) + "px";
+      phoneTela.style.borderRadius = mistura(38, 0, x) + "px";
+    }
+    cinema.style.setProperty("--x", x.toFixed(4));
+    cinema.style.setProperty("--saida", limita((prog - .72) / .16).toFixed(4));
+
+    if (r.top < h * .9 && r.bottom > 0) ligarPhone("scroll");
+    document.body.classList.toggle("cinema-ativo", x > .72 && r.bottom > h * .35);
+  }
+  if (CINEMA_MQ.addEventListener) CINEMA_MQ.addEventListener("change", function () { onScroll(); });
+  else if (CINEMA_MQ.addListener) CINEMA_MQ.addListener(function () { onScroll(); });
+
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(render); } }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
+  render();
+
+  /* =========================================================
+     6 · REVEAL, CORRIDA E NÚMEROS
+     Só ligam depois da abertura: um observador não sabe que a
+     cena está na frente, e os números contariam sem ninguém ver.
+     ========================================================= */
+  var ligado = false;
+  function ligarObservadores() {
+    if (ligado) return;
+    ligado = true;
+    var alvos = $$(".section__head, .motivo, .corrida, .linha-edital, .vaga, .etapa, .frente, .plat, .duo__foto, .duo__texto, .galeria, .plano, .faq__item, .final__inner");
+    if (reduced || !("IntersectionObserver" in window)) {
+      $$("[data-corrida]").forEach(function (c) { c.classList.add("is-on"); });
       return;
     }
-
-    if (!EXIT_POPUP_ENVIA_LEAD || LEAD_MODE === "site") {
-      e.stopImmediatePropagation();
-    }
-
-    if (EXIT_POPUP_ENVIA_LEAD && LEAD_MODE === "site") {
-      trackLead({
-        nome: document.getElementById("exit-nome").value.trim(),
-        email: document.getElementById("exit-email").value.trim(),
-        telefone: document.getElementById("exit-telefone").value.trim()
+    alvos.forEach(function (el) { el.classList.add("reveal"); });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var el = e.target, irmaos = el.parentNode ? $$(":scope > .reveal", el.parentNode) : [];
+        var atraso = Math.max(0, irmaos.indexOf(el)) * 90;
+        setTimeout(function () {
+          el.classList.add("is-in");
+          if (el.hasAttribute("data-corrida")) setTimeout(function () { el.classList.add("is-on"); }, 300);
+          /* a classe sai depois da entrada: não briga com o hover */
+          setTimeout(function () { el.classList.remove("reveal", "is-in"); }, 1000);
+        }, Math.min(atraso, 400));
+        io.unobserve(el);
       });
-    }
+    }, { threshold: .14, rootMargin: "0px 0px -6% 0px" });
+    alvos.forEach(function (el) { io.observe(el); });
 
-    enviarComunidade();
+    var ioNum = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        contar(e.target); ioNum.unobserve(e.target);
+      });
+    }, { threshold: .6 });
+    $$("[data-conta]").forEach(function (el) { ioNum.observe(el); });
   }
-}, true);
+  function contar(el) {
+    var fim = parseInt(el.getAttribute("data-conta"), 10), suf = el.getAttribute("data-suf") || "";
+    var ini = null, DUR = 1400;
+    function passo(ts) {
+      if (!ini) ini = ts;
+      var p = Math.min((ts - ini) / DUR, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(fim * e) + suf;
+      if (p < 1) requestAnimationFrame(passo);
+    }
+    requestAnimationFrame(passo);
+  }
+  if (!comAbertura) ligarObservadores();
 
-ExitIntent.init();
+  /* =========================================================
+     7 · PEÇAS
+     ========================================================= */
+
+  /* ─── plataforma: abas trocam o print, com varredura de luz ─── */
+  (function plataforma() {
+    var caixa = $("[data-plat]");
+    if (!caixa) return;
+    var abas = $$(".plat__aba", caixa), telas = $$(".plat__vista img", caixa), vista = $(".plat__vista", caixa);
+    var atual = 0, timer = null;
+    function mostrar(i) {
+      atual = (i + abas.length) % abas.length;
+      abas.forEach(function (a, k) { a.classList.toggle("is-on", k === atual); a.setAttribute("aria-selected", k === atual); });
+      telas.forEach(function (t, k) { t.classList.toggle("is-on", k === atual); });
+      vista.classList.remove("is-trocando"); void vista.offsetWidth; vista.classList.add("is-trocando");
+    }
+    /* O ciclo só roda com a vitrine NA TELA: se ele contasse desde o
+       carregamento, quem chegasse aqui já cairia na 3ª ou 4ª aba. Na
+       primeira vez que ela aparece, começa da Sala de aula; fora da tela,
+       para. Depois que a pessoa escolhe uma aba, o ciclo não volta. */
+    var escolheu = false, jaViu = false;
+    function parar() { clearInterval(timer); timer = null; }
+    function rodar() {
+      if (reduced || escolheu || timer) return;
+      timer = setInterval(function () { mostrar(atual + 1); }, 5200);
+    }
+    abas.forEach(function (a, k) {
+      a.addEventListener("click", function () { escolheu = true; parar(); mostrar(k); });
+    });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) {
+        if (en[0].isIntersecting) {
+          if (!jaViu) { jaViu = true; mostrar(0); }
+          rodar();
+        } else parar();
+      }, { threshold: .35 }).observe(caixa);
+    } else rodar();
+  })();
+
+  /* ─── galeria de aprovados: duas fileiras, cópia aria-hidden para o laço ─── */
+  (function galeria() {
+    var alvo = document.getElementById("galeria");
+    if (!alvo) return;
+    [[1, 7], [8, 14]].forEach(function (faixa, idx) {
+      var fila = document.createElement("div");
+      fila.className = "fila" + (idx ? " fila--volta" : "");
+      var trilho = document.createElement("div");
+      trilho.className = "fila__track";
+      for (var rep = 0; rep < 2; rep++) {
+        for (var n = faixa[0]; n <= faixa[1]; n++) {
+          var fig = document.createElement("figure");
+          fig.className = "aluno";
+          if (rep) fig.setAttribute("aria-hidden", "true");
+          var img = new Image(480, 600);
+          img.src = "public/alunos/aluno-" + (n < 10 ? "0" : "") + n + ".webp";
+          img.loading = "lazy"; img.decoding = "async";
+          img.alt = rep ? "" : "Aluno aprovado com o Prof. Everton Mota";
+          fig.appendChild(img); trilho.appendChild(fig);
+        }
+      }
+      fila.appendChild(trilho); alvo.appendChild(fila);
+    });
+  })();
+
+  /* ─── estrelas em volta do Supremo ─── */
+  (function estrelas() {
+    var alvo = document.getElementById("estrelas");
+    if (!alvo || reduced) return;
+    /* nas bordas, nunca no meio do texto */
+    var pos = [[2, 8], [96, 4], [-1, 38], [99, 30], [3, 70], [97, 64], [8, 96], [92, 94], [50, -1], [30, 2], [70, 100], [100, 84]];
+    pos.forEach(function (p, i) {
+      var e = document.createElement("i");
+      e.className = "estrela";
+      e.style.left = p[0] + "%"; e.style.top = p[1] + "%";
+      e.style.setProperty("--s", (10 + Math.random() * 12).toFixed(0) + "px");
+      e.style.setProperty("--d", (2 + Math.random() * 2).toFixed(2) + "s");
+      e.style.setProperty("--a", (i * .37).toFixed(2) + "s");
+      alvo.appendChild(e);
+    });
+  })();
+
+  /* ─── contagem até a prova (modelo B, só com data real) ─── */
+  (function contagemProva() {
+    var caixa = document.getElementById("contagem");
+    if (!caixa || modelo !== "b" || !ed.provaISO) return;
+    var alvo = new Date(ed.provaISO).getTime();
+    if (isNaN(alvo)) return;
+    caixa.hidden = false;
+    var cel = { d: $('[data-c="d"]', caixa), h: $('[data-c="h"]', caixa), m: $('[data-c="m"]', caixa), s: $('[data-c="s"]', caixa) };
+    function dois(n) { return (n < 10 ? "0" : "") + n; }
+    function tique() {
+      var r = Math.max(0, alvo - Date.now()) / 1000;
+      cel.d.textContent = dois(Math.floor(r / 86400));
+      cel.h.textContent = dois(Math.floor(r % 86400 / 3600));
+      cel.m.textContent = dois(Math.floor(r % 3600 / 60));
+      cel.s.textContent = dois(Math.floor(r % 60));
+    }
+    tique(); setInterval(tique, 1000);
+  })();
+
+  /* ─── brilho seguindo o cursor nas frentes ─── */
+  $$(".frente").forEach(function (el) {
+    el.addEventListener("mousemove", function (e) {
+      var r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", ((e.clientX - r.left) / r.width) * 100 + "%");
+      el.style.setProperty("--my", ((e.clientY - r.top) / r.height) * 100 + "%");
+    });
+  });
+
+  /* =========================================================
+     8 · ATMOSFERA — brasas da página
+     ========================================================= */
+  var TONS = ["rgba(201,174,122,.9)", "rgba(175,146,86,.85)", "rgba(196,112,63,.85)"];
+  function semear(alvo, quantidade) {
+    if (!alvo || reduced) return;
+    for (var b = 0; b < quantidade; b++) {
+      var br = document.createElement("i");
+      br.className = "brasa";
+      br.style.setProperty("--x", (Math.random() * 100).toFixed(2) + "%");
+      br.style.setProperty("--s", (2 + Math.random() * 3).toFixed(1) + "px");
+      br.style.setProperty("--cor", TONS[Math.random() < .34 ? 2 : (Math.random() < .5 ? 0 : 1)]);
+      br.style.setProperty("--op", (.35 + Math.random() * .45).toFixed(2));
+      br.style.setProperty("--dur", (13 + Math.random() * 13).toFixed(1) + "s");
+      br.style.setProperty("--atraso", "-" + (Math.random() * 26).toFixed(1) + "s");
+      alvo.appendChild(br);
+    }
+  }
+  semear(document.getElementById("brasas"), window.innerWidth < 640 ? 14 : 24);
+  semear(document.getElementById("planosBrasas"), 22);
+
+  var ano = document.getElementById("year");
+  if (ano) ano.textContent = new Date().getFullYear();
+})();
