@@ -51,25 +51,15 @@ O modelo B **não está na `main`**: nem escondido, nem no código-fonte. Na bra
 | Preços e links de checkout dos planos | `CONFIG.planos` no `script.js` |
 | De/por do Supremo (hoje: total parcelado × à vista) | `CONFIG.planos.supremo` (`de`, `off`, `selo`) |
 | Datas do edital (modelo B) | `CONFIG.edital` no `script.js` |
-| Vídeo | `data-video-url` dos dois iframes (MacBook e iPhone) no `index.html` |
 
-## A abertura e o vídeo
+## A abertura
 
-- **Abertura**: "MENTORIA" bate no vidro, "PMPE" sobe e colide. Toca uma vez por sessão.
-  `?abertura=0` pula e `?abertura=1` força.
-- **Desktop**: um MacBook que vem para a frente com a rolagem e liga o vídeo. O player é carregado
-  antes, escondido, para o play ser instantâneo.
-- **Celular**: um iPhone que cresce até ocupar a tela inteira. O vídeo toca mudo sozinho, e um toque
-  liga o som e abre em tela cheia.
-- **Som**: nenhum navegador toca som antes de a pessoa tocar ou clicar na página. Por isso o vídeo
-  começa mudo, e o primeiro toque liga o som.
-- **"Ativar som" da Panda**: fica coberto por um botão nosso, porque não dá para remover pela URL. Para
-  tirar de vez, desligue o indicador de mudo no painel da Panda.
+"MENTORIA" bate no vidro e "PMPE" sobe e colide. Toca uma vez por sessão. `?abertura=0` pula e
+`?abertura=1` força. Logo abaixo do hero vem a prova social (os aprovados).
 
 ## Medição (dataLayer)
 
-`modelo_pagina` · `clique_checkout` (plano, valor) · `mission_video_started` ·
-`mission_video_sound_on` · `mission_video_tap`
+`modelo_pagina` · `clique_checkout` (plano, valor)
 
 ## Pendências
 

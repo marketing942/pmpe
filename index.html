@@ -166,116 +166,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </div>
 
-<!-- =========================================================
-     MISSÃO EM VÍDEO — o notebook que liga com a rolagem
-     ---------------------------------------------------------
-     O .missao__trilho é mais alto que a tela e a .missao__cena fica
-     presa (sticky) dentro dele: enquanto a pessoa rola, o script
-     escreve o progresso em --p e o notebook vem de longe, inclinado,
-     até ficar de frente e grande. Perto do fim ele LIGA: só então o
-     iframe da Panda recebe o src (autoplay sem som). Antes disso a
-     página não baixa nada do player.
-     ========================================================= -->
-<section class="missao" id="video" aria-labelledby="missao-title">
+<!-- ================= APROVADOS — a prova social abre a página ================= -->
+<section class="section section--alt" id="aprovados" aria-labelledby="aprov-title">
   <div class="container">
-    <div class="section__head missao__head">
-      <span class="eyebrow">Sua missão começa aqui</span>
-      <h2 class="section__title" id="missao-title">Pare de estudar no escuro. <span class="gold">Assuma o controle.</span></h2>
-      <p class="section__lead">
-        Uma preparação construída para a realidade da <strong>PMPE</strong>. Continue descendo — o notebook
-        liga sozinho — e entenda como transformar esforço em direção, constância e resultado.
-      </p>
+    <div class="section__head">
+      <span class="eyebrow">Prova real</span>
+      <h2 class="section__title" id="aprov-title">Eles estavam onde você está. <span class="gold">Hoje vestem a farda</span></h2>
     </div>
   </div>
-
-  <div class="missao__trilho" id="missaoTrilho">
-    <div class="missao__cena">
-      <div class="laptop" id="laptop">
-        <i class="laptop__luz" aria-hidden="true"></i>
-        <img class="laptop__render" src="public/macbook.webp" width="1536" height="1024" loading="lazy" decoding="async"
-             alt="Notebook com a apresentação da Mentoria PMPE">
-        <div class="laptop__tela">
-          <iframe
-            id="panda-3b7416bb-59a4-4337-9e66-18ad2ee45f49"
-            class="laptop__player"
-            data-video-url="https://player-vz-cdf20c7e-010.tv.pandavideo.com.br/embed/?v=3b7416bb-59a4-4337-9e66-18ad2ee45f49"
-            title="Conheça a Mentoria PMPE"
-            allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
-            allowfullscreen></iframe>
-          <button type="button" class="laptop__off" id="laptopOff">
-            <img src="public/emblema-leao.webp" alt="" width="400" height="465">
-            <span class="laptop__power" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2v9M6.35 5.65a8 8 0 1 0 11.3 0"/></svg></span>
-            <span class="laptop__rot">Role para ligar</span>
-            <span class="sr-only">ou toque para ligar o vídeo</span>
-          </button>
-          <!-- Cobre o "ATIVAR SOM" da Panda (fixo: ~182x54px a 10px do canto,
-               em qualquer tamanho de player) enquanto o vídeo está mudo. O
-               clique é na NOSSA página, então libera o som pelo comando. -->
-          <button type="button" class="laptop__som shine" id="laptopSom">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 8.8a4.5 4.5 0 0 1 0 6.4M18.3 6a8.5 8.5 0 0 1 0 12"/></svg>
-            <span>Toque para<br>ouvir</span>
-          </button>
-          <i class="laptop__boot" aria-hidden="true"></i>
-          <i class="laptop__scan" aria-hidden="true"></i>
-        </div>
-      </div>
-      <p class="missao__dica" aria-hidden="true"><span></span>Continue descendo para ligar</p>
-    </div>
-  </div>
-
-  <!-- =========================================================
-       CINEMA MOBILE — no celular o MacBook sai e entra um iPhone
-       ---------------------------------------------------------
-       O .cinema é mais alto que a tela e o palco fica preso (sticky).
-       Com a rolagem o iPhone cresce até ocupar a tela INTEIRA, e a
-       moldura some: vira um cinema de bolso. O vídeo toca mudo sozinho;
-       por cima dele um toque dá som e abre em tela cheia.
-       ========================================================= -->
-  <div class="cinema" id="cinema" aria-label="Vídeo da Mentoria PMPE">
-    <div class="cinema__palco">
-      <i class="cinema__amb" aria-hidden="true"></i>
-      <div class="phone" id="phone">
-        <img class="phone__render" src="public/iphone.webp" width="1024" height="1536" loading="lazy" decoding="async"
-             alt="iPhone exibindo o vídeo da Mentoria PMPE">
-        <div class="phone__tela">
-          <iframe
-            id="panda-mobile-3b7416bb-59a4-4337-9e66-18ad2ee45f49"
-            class="phone__player"
-            data-video-url="https://player-vz-cdf20c7e-010.tv.pandavideo.com.br/embed/?v=3b7416bb-59a4-4337-9e66-18ad2ee45f49"
-            title="Conheça a Mentoria PMPE"
-            allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen"
-            allowfullscreen></iframe>
-          <button type="button" class="phone__off" id="phoneOff">
-            <img src="public/emblema-leao.webp" alt="" width="400" height="465">
-            <span class="phone__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6.8 17 12l-8 5.2z"/></svg></span>
-            <b>Toque para assistir</b>
-            <small>ou continue descendo</small>
-          </button>
-          <!-- aparece com o player ligado quando ele trava ou roda mudo -->
-          <button type="button" class="phone__tap" id="phoneTap">
-            <span class="phone__ico" aria-hidden="true">
-              <svg class="ico-play" viewBox="0 0 24 24"><path d="M9 6.8 17 12l-8 5.2z"/></svg>
-              <svg class="ico-som" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="onda" d="M15.5 8.8a4.5 4.5 0 0 1 0 6.4M18.3 6a8.5 8.5 0 0 1 0 12"/></svg>
-            </span>
-            <b class="txt-play">Toque para assistir</b>
-            <b class="txt-som">Toque para ouvir</b>
-            <small>abre em tela cheia</small>
-          </button>
-          <i class="phone__boot" aria-hidden="true"></i>
-        </div>
-        <span class="phone__notch" aria-hidden="true"></span>
-      </div>
-      <p class="cinema__topo" aria-hidden="true"><span>CPPEM</span><i></i><span>Mentoria PMPE</span></p>
-      <p class="cinema__continua" aria-hidden="true">Continue descendo <span>↓</span></p>
-    </div>
-  </div>
-
-  <div class="container">
-    <ul class="missao__pontos">
-      <li><b>01</b>Direção clara até o dia da prova</li>
-      <li><b>02</b>Método, cronograma e acompanhamento</li>
-      <li><b>03</b>Uma preparação para vestir a farda</li>
-    </ul>
+  <div class="galeria" id="galeria" role="group" aria-label="Fotos de alunos aprovados com o Prof. Everton Mota"></div>
+  <div class="container center aprovados__rodape">
+    <a class="btn btn--gold btn--lg shine" href="#planos"><span>Quero ser o próximo</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
   </div>
 </section>
 
@@ -507,20 +408,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- ================= APROVADOS ================= -->
-<section class="section" id="aprovados" aria-labelledby="aprov-title">
-  <div class="container">
-    <div class="section__head">
-      <span class="eyebrow">Prova real</span>
-      <h2 class="section__title" id="aprov-title">Eles estavam onde você está. <span class="gold">Hoje vestem a farda</span></h2>
-    </div>
-  </div>
-  <div class="galeria" id="galeria" role="group" aria-label="Fotos de alunos aprovados com o Prof. Everton Mota"></div>
-  <div class="container center aprovados__rodape">
-    <a class="btn btn--gold btn--lg shine" href="#planos"><span>Quero ser o próximo</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
   </div>
 </section>
 
