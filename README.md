@@ -10,22 +10,26 @@ push na `main`.
 
 ## Os dois modelos
 
-| Modelo | Onde está | Quando vai ao ar |
-|---|---|---|
-| **A · pré-edital** ("Está quase lançando…") | branch `main` | agora |
-| **B · edital lançado** ("Lançou o edital", carimbo, linha do edital) | branch `modelo-b-edital` | no dia do edital |
+| Endereço | Arquivo | Modelo | Quem vê |
+|---|---|---|---|
+| **pmpe.cppem.com.br** | `index.html` | **A · pré-edital** ("Está quase lançando…") | o público |
+| **pmpe.cppem.com.br/edital** | `edital.html` | **B · edital lançado** ("Lançou o edital", carimbo, linha do edital) | a equipe (e a live) |
 
-O modelo B **não está na `main`**: nem escondido, nem no código-fonte. Na branch `modelo-b-edital`, o B
-é o padrão da página, e o A continua acessível por `?modelo=a`.
+As duas páginas usam o mesmo `styles.css`, `script.js` e `public/`. O `/edital` já fica no ar antes do
+edital, para o caso de ele sair de madrugada. Ele fica **fora do Google** (`noindex` na página e o
+cabeçalho `X-Robots-Tag` no `vercel.json`) e sem link no site. Mesmo assim, é uma URL aberta: quem
+tiver o link consegue ver.
+
+O `index.html` não tem nada do modelo B, nem escondido no código-fonte.
+
+> ⚠️ **Ajuste de conteúdo comum** (planos, textos, seções) vale para os **dois** arquivos. Mudou no
+> `index.html`, mude também no `edital.html`. Preço e checkout moram no `script.js` e já valem para os
+> dois.
 
 ## 📅 No dia do edital
 
-1. Troque para a branch do B:
-   ```bash
-   git checkout modelo-b-edital
-   git merge main          # traz qualquer ajuste feito no A até lá
-   ```
-2. Em `script.js`, preencha `CONFIG.edital` com o que o edital disser:
+1. **Datas.** Em `script.js`, preencha `CONFIG.edital` com o que o edital disser. Isso só aparece no
+   `/edital`:
    ```js
    edital: {
      publicacao: "12/10",
@@ -36,13 +40,16 @@ O modelo B **não está na `main`**: nem escondido, nem no código-fonte. Na bra
    }
    ```
    Campo vazio mostra "Conforme edital". Sem `provaISO`, a contagem não aparece.
-3. Confira localmente abrindo o `index.html`, e então publique:
+2. **Levar o B para o público** (quando for a hora): copie o `edital.html` para o `index.html` e, no
+   `index.html`, apague a linha `<meta name="robots" content="noindex, nofollow">` e devolva o
+   `<title>` da página principal.
    ```bash
-   git commit -am "Atualiza datas do edital"
-   git checkout main
-   git merge modelo-b-edital
+   cp edital.html index.html
+   # editar o index.html: tirar o meta robots e ajustar o <title>
+   git commit -am "Edital publicado: modelo B na página principal"
    git push
    ```
+   Até esse passo, o público continua vendo o pré-edital na raiz, e a equipe usa o `/edital`.
 
 ## Onde mexer
 
