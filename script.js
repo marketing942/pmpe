@@ -44,7 +44,7 @@
            vista. Se um dia houver preço cheio oficial, ele entra no `de` e
            a economia/o OFF são recalculados à mão. */
         mensal: "R$ 208,35", vista: "R$ 1.997", de: "R$ 2.500,20",
-        off: "20% OFF", selo: "Você economiza R$ 503,20",
+        off: "20% OFF à vista", selo: "Você economiza R$ 503,20 à vista",
         checkout: "https://pxa.cppem.com.br/lt/plano-de-combate-supremo"
       }
     },
