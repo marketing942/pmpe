@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-modelo="a">
+<html lang="pt-BR" data-modelo="b">
 <head>
 
   <!-- Google Tag Manager (mesmo container das demais landings do CPPEM).
@@ -36,16 +36,17 @@
 <link rel="stylesheet" href="styles.css">
 
 <!-- Decidido ANTES do CSS pintar:
-       · O MODELO é o A (pré-edital), fixo. O modelo B (edital lançado) NÃO
-         está neste arquivo: ele mora na branch "modelo-b-edital" e entra no
-         ar com o merge dela, no dia do edital (ver README).
+       · O MODELO é o B (edital lançado), fixo: o edital saiu e esta é a
+         página oficial. O pré-edital (modelo A) está no histórico do Git.
+         O antigo endereço da equipe, /edital, redireciona para cá
+         (vercel.json).
        · A ABERTURA cheia: uma vez por sessão, nunca para quem pediu menos
          movimento. ?abertura=0 pula e ?abertura=1 força. Quem já viu recebe
          a versão curta das mesmas duas batidas. -->
 <script>
   (function () {
     var d = document.documentElement, q = location.search, visto = null;
-    d.setAttribute("data-modelo", "a");
+    d.setAttribute("data-modelo", "b");
     try { visto = sessionStorage.getItem("mentoria-abertura"); } catch (e) {}
     var reduz = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var tocar = /[?&]abertura=1/.test(q) || (!reduz && !visto && !/[?&]abertura=0/.test(q));
@@ -71,6 +72,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </a>
     <nav class="nav" aria-label="Seções da página">
       <a href="#relogio" data-so="a">Por que agora</a>
+      <a href="#relogio" data-so="b">O edital</a>
       <a href="#concurso">O concurso</a>
       <a href="#metodo">A mentoria</a>
       <a href="#mentor">Mentor</a>
@@ -105,6 +107,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <i class="alerta__sep" aria-hidden="true"></i>
         <span class="alerta__extra">1.320 vagas autorizadas</span>
       </span>
+      <span class="alerta alerta--b anim d0" data-so="b">
+        <i class="alerta__ponto" aria-hidden="true"></i>
+        <b>Lançou o edital da PMPE</b>
+        <i class="alerta__sep" aria-hidden="true"></i>
+        <span class="alerta__extra">o relógio já está correndo</span>
+      </span>
 
       <h1 class="titulo" aria-label="Mentoria PMPE">
         <span class="titulo__palco" aria-hidden="true">
@@ -126,16 +134,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <i class="titulo__costura"></i>
           </span>
 
+          <span class="carimbo" data-so="b"><small>Oficial</small><b>Edital lançado</b></span>
         </span>
       </h1>
 
       <p class="hero__gancho anim d1" data-so="a">
         Está quase lançando. <em>E quem espera o edital para começar, já começa atrasado.</em>
       </p>
+      <p class="hero__gancho anim d1" data-so="b">
+        Lançou o edital. <em>A partir de hoje, cada dia sem plano é um dia a menos até a prova.</em>
+      </p>
 
       <div class="hero__cta anim d3">
         <a class="btn btn--gold btn--lg shine" href="#planos">
           <span data-so="a">Começar antes do edital</span>
+          <span data-so="b">Entrar na reta de ataque</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
         <a class="btn btn--ghost btn--lg" href="#metodo"><span>Como funciona</span></a>
@@ -225,6 +238,80 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <!-- ─── MODELO B · edital lançado ─── -->
+    <div data-so="b">
+      <div class="section__head">
+        <span class="eyebrow eyebrow--alerta">O relógio já está correndo</span>
+        <h2 class="section__title">Lançou o edital. <span class="gold">Agora é execução.</span></h2>
+        <p class="section__lead">
+          Não existe mais "quando sair eu começo". Saiu. Daqui até a prova, cada semana precisa ter
+          <strong>prioridade, missão e revisão</strong> — e é exatamente isso que a mentoria entrega.
+        </p>
+      </div>
+
+      <!-- As datas vêm do CONFIG.edital no script.js. Vazias, mostram "conforme edital". -->
+      <div class="linha-edital">
+        <div class="passo passo--agora">
+          <span class="passo__pip">01</span>
+          <b>Edital publicado</b>
+          <span>Você está aqui</span>
+          <span class="passo__data" data-slot="ed-publicacao">Agora</span>
+        </div>
+        <div class="passo">
+          <span class="passo__pip">02</span>
+          <b>Inscrições</b>
+          <span>Garanta a sua no prazo</span>
+          <span class="passo__data" data-slot="ed-inscricoes">Conforme edital</span>
+        </div>
+        <div class="passo">
+          <span class="passo__pip">03</span>
+          <b>Prova objetiva</b>
+          <span>A etapa que mais elimina</span>
+          <span class="passo__data" data-slot="ed-prova">Conforme edital</span>
+        </div>
+        <div class="passo">
+          <span class="passo__pip">04</span>
+          <b>TAF</b>
+          <span>Eliminatório</span>
+          <span class="passo__data" data-slot="ed-taf">Conforme edital</span>
+        </div>
+        <div class="passo">
+          <span class="passo__pip">05</span>
+          <b>Demais etapas</b>
+          <span>Saúde, psicotécnico e investigação</span>
+          <span class="passo__data">Conforme edital</span>
+        </div>
+      </div>
+
+      <!-- Só aparece com CONFIG.edital.provaISO preenchido: contagem inventada
+           seria número falso na cara do candidato. -->
+      <div class="contagem" id="contagem" hidden>
+        <span class="contagem__rot">Até a prova objetiva</span>
+        <div class="contagem__num" aria-live="off">
+          <div><b data-c="d">00</b><span>dias</span></div>
+          <div><b data-c="h">00</b><span>horas</span></div>
+          <div><b data-c="m">00</b><span>min</span></div>
+          <div><b data-c="s">00</b><span>seg</span></div>
+        </div>
+      </div>
+
+      <div class="motivos">
+        <article class="motivo">
+          <span class="motivo__n gold">01</span>
+          <h3>Sem tempo para montar cronograma</h3>
+          <p>Você não vai perder a primeira semana decidindo o que estudar. A rota chega pronta, dia por dia.</p>
+        </article>
+        <article class="motivo">
+          <span class="motivo__n gold">02</span>
+          <h3>Prioridade pelo que mais cai</h3>
+          <p>Na reta de ataque não dá para estudar tudo igual. O plano pesa as matérias pelo edital e pelo seu desempenho.</p>
+        </article>
+        <article class="motivo">
+          <span class="motivo__n gold">03</span>
+          <h3>Revisão e simulado até o dia</h3>
+          <p>Questões, simulados e ranking para chegar na prova treinado no formato — e não só com o conteúdo visto.</p>
+        </article>
+      </div>
+    </div>
 
   </div>
 </section>
@@ -255,6 +342,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           Remuneração de R$ 5.617,92 a R$ 12.937,33 na carreira, após o curso de formação.
         </div>
         <span class="vaga__nota" data-so="a">Edital previsto para 2026</span>
+        <span class="vaga__nota" data-so="b">Edital publicado</span>
       </article>
 
       <div class="etapas">
@@ -406,6 +494,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="container">
     <div class="section__head">
       <span class="eyebrow" data-so="a">Escolha sua estratégia</span>
+      <span class="eyebrow eyebrow--alerta" data-so="b">Edital na rua · escolha agora</span>
       <h2 class="section__title" id="planos-title">Três níveis. <span class="gold">Uma missão.</span></h2>
       <p class="section__lead">Entre pelo caminho que combina com a profundidade de acompanhamento que você quer até a prova.</p>
     </div>
@@ -519,6 +608,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <summary>O edital ainda não saiu. Vale começar agora?</summary>
         <p>As <strong>1.320 vagas estão autorizadas</strong>. Quem começa antes do edital chega na prova com o conteúdo visto e revisado; quem espera começa com o relógio já correndo contra. Quando o edital sair, a sua rota é ajustada a ele.</p>
       </details>
+      <details class="faq__item" data-so="b">
+        <summary>O edital já saiu. Ainda dá tempo?</summary>
+        <p>Dá — desde que cada dia até a prova seja bem usado. É exatamente o que a mentoria faz: o cronograma é montado a partir do <strong>tempo que você tem até a prova</strong>, com prioridade para o que mais pesa.</p>
+      </details>
       <details class="faq__item">
         <summary>Qual a diferença entre os três planos?</summary>
         <p>O <strong>Operacional</strong> entrega o cronograma individual, as metas diárias e o acompanhamento. O <strong>Tático</strong> soma mentorias ao vivo mensais, os cursos da plataforma e a preparação de TAF e psicotécnico. O <strong>Supremo</strong> inclui tudo isso e os materiais estratégicos digitais do CPPEM.</p>
@@ -544,6 +637,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="container final__inner">
     <img class="final__leao" src="public/emblema-leao.webp" alt="" width="400" height="465" loading="lazy">
     <h2 id="final-title" data-so="a">Quando o edital sair, você vai estar <span class="gold">começando ou revisando?</span></h2>
+    <h2 data-so="b">O edital saiu. A vaga é de quem <span class="gold">chegar pronto.</span></h2>
     <p>São <strong>1.320 vagas</strong> na PMPE. A Mentoria PMPE começa hoje, com acesso imediato e a rota montada para você.</p>
     <a class="btn btn--gold btn--lg shine" href="#planos"><span>Escolher meu plano</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     <span class="final__note">Operacional, Tático ou Supremo · 7 dias de garantia</span>
@@ -595,6 +689,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="dock__info">
     <b>Mentoria PMPE</b>
     <span data-so="a">Comece antes do edital</span>
+    <span data-so="b">Edital lançado · entre agora</span>
   </div>
   <a class="btn btn--gold" href="#planos"><span>Ver planos</span></a>
 </div>

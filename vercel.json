@@ -10,15 +10,13 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
-    },
+    }
+  ],
+  "redirects": [
     {
       "source": "/edital",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
-      ]
+      "destination": "/",
+      "permanent": false
     }
   ]
 }
