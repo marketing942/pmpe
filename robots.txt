@@ -1,0 +1,15 @@
+# Mentoria PMPE — pmpe.cppem.com.br
+# Página de venda: indexável. Os arquivos internos do repositório
+# (documentação, kit de exemplo e scripts de apoio) são publicados pela
+# Vercel junto com o site e não têm valor de busca.
+User-agent: *
+Allow: /
+Disallow: /docs/
+Disallow: /exit-popup-kit/
+Disallow: /README.md
+Disallow: /TRACKING.md
+Disallow: /EXIT-POPUP.md
+Disallow: /google-apps-script.js
+Disallow: /validar-tracking.js
+
+Sitemap: https://pmpe.cppem.com.br/sitemap.xml
