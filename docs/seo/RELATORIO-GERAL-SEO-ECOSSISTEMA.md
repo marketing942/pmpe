@@ -1,13 +1,13 @@
 # Relatório geral de SEO — ecossistema CPPEM
 
-23/10/2026 · branch `seo/otimizacao-organica-20261023` em cada repositório · nada publicado sem aprovação.
+23/10/2026 · branch `seo/otimizacao-organica-20261023` em cada repositório · publicado com aprovação do responsável.
 
 ## Resumo
 
 - **Repositórios analisados:** 9 (7 páginas estáticas na Vercel + 2 apps Next.js).
 - **Rotas de conteúdo identificadas:** 12 (contando os modelos dinâmicos da Central de Ajuda como uma rota cada), mais 1 redirecionamento (`pmpe /edital`) e 2 APIs.
 - **Rotas com potencial orgânico:** todas as de conteúdo; Black Friday só em marca e na janela da campanha.
-- **Problemas (sem contar registros "Info"):** 65 · **corrigidos/mitigados na branch:** 38 · os demais são recomendações que dependem de decisão, dado ou acesso.
+- **Problemas (sem contar registros "Info"):** 65 · **corrigidos/mitigados na branch:** 41 · os demais são recomendações que dependem de decisão, dado ou acesso.
 - **Tracking:** nenhum ID, evento, script, seletor ou endpoint alterado; fluxos de formulário e checkout idênticos antes × depois em teste de execução.
 
 ## Matriz inicial
@@ -15,28 +15,28 @@
 | Repositório | Finalidade | Stack | Domínio | Rotas | Indexação recomendada | Potencial SEO |
 |---|---|---|---|---|---|---|
 | [PMPE — Mentoria PMPE](https://github.com/marketing942/pmpe) | Landing page de vendas. | HTML/CSS/JS estático (Vercel) | pmpe.cppem.com.br | `/`<br>`/edital` | Indexar | **Alto** — Edital PMPE 2026 publicado (1.320 vagas: 1.250 soldado, 70 oficial; banca Instituto AOCP; prova objetiva prevista para 21/02/2027 segundo fontes secundárias). Demanda concentrada de agora até a prova. |
-| [Contato Colégio CPPEM](https://github.com/marketing942/Contato-Colegio) | Página de captura com conteúdo institucional (pilares, depoimentos, nova sede, endereços). | HTML/CSS/JS estático (Vercel) | não identificado com certeza (padrão `colegio*.cppem.com.br`) | `/` | Indexar | **Alto (local)** — Busca local por escola particular tem intenção forte e sazonalidade agora (matrículas 2027). Concorrentes locais aparecem em agregadores (Melhor Escola, Escol.as, Quero Bolsa). |
-| [SRV PMPE — Super Revisão de Véspera](https://github.com/marketing942/SRV-PMPE) | Página de evento / venda. | HTML/CSS/JS estático (Vercel) | não identificado | `/` | Indexar até o evento; depois, manter como "edição anterior" ou redirecionar para a próxima edição (decisão) | **Médio** — Busca local e sazonal (semanas antes de 21/02/2027). Concorrência direta em plataformas de evento (Sympla) e em blogs de revisão de véspera. |
-| [Supletivo](https://github.com/marketing942/supletivo) | Landing de vendas/captação. | Next.js 14 (SSG, Vercel) | cppem-supletivo-filiado.vercel.app (possível domínio próprio `supletivo*.cppem.com.br`) | `/`<br>`/robots.txt, /sitemap.xml` | Indexar, com ressalvas de conformidade das promessas (ver P1) | **Alto (demanda) / Médio (viabilidade)** — "Supletivo online" e "EJA online" têm demanda nacional, mas a SERP tem guias de marcas grandes (Pravaler, Descomplica) e a página é de parceiro filiado — risco de conteúdo parecido com outras páginas da rede. |
+| [Contato Colégio CPPEM](https://github.com/marketing942/Contato-Colegio) | Página de captura com conteúdo institucional (pilares, depoimentos, nova sede, endereços). | HTML/CSS/JS estático (Vercel) | contato.colegio.cppem.com.br | `/` | Indexar | **Alto (local)** — Busca local por escola particular tem intenção forte e sazonalidade agora (matrículas 2027). Concorrentes locais aparecem em agregadores (Melhor Escola, Escol.as, Quero Bolsa). |
+| [SRV PMPE — Super Revisão de Véspera](https://github.com/marketing942/SRV-PMPE) | Página de evento / venda. | HTML/CSS/JS estático (Vercel) | srv-pmpe.cppem.com.br | `/` | Indexar até o evento; depois, manter como "edição anterior" ou redirecionar para a próxima edição (decisão) | **Médio** — Busca local e sazonal (semanas antes de 21/02/2027). Concorrência direta em plataformas de evento (Sympla) e em blogs de revisão de véspera. |
+| [Supletivo](https://github.com/marketing942/supletivo) | Landing de vendas/captação. | Next.js 14 (SSG, Vercel) | supletivo.cppem.com.br (o cppem-supletivo-filiado.vercel.app segue no ar e aponta o canonical para cá) | `/`<br>`/robots.txt, /sitemap.xml` | Indexar, com ressalvas de conformidade das promessas (ver P1) | **Alto (demanda) / Médio (viabilidade)** — "Supletivo online" e "EJA online" têm demanda nacional, mas a SERP tem guias de marcas grandes (Pravaler, Descomplica) e a página é de parceiro filiado — risco de conteúdo parecido com outras páginas da rede. |
 | [Contato Unicive](https://github.com/marketing942/Contato-unicive) | Página de captura com catálogo resumido de cursos e FAQ. | HTML/CSS/JS estático (Vercel) | contato.unicive.cppem.com.br | `/` | Indexar | **Médio** — Há demanda local por graduação EAD, mas a SERP é dominada por agregadores (ead.com.br, Quero Bolsa, Educa Mais Brasil) e grandes grupos. Os cursos de segurança pública são o nicho com mais aderência ao público CPPEM. |
 | [Mentoria Individual](https://github.com/marketing942/mentoria-individual) | Landing de captação/vendas. | HTML/CSS/JS estático (Vercel) | individual.cppem.com.br | `/` | Indexar | **Médio** — Nicho comercial claro ("mentoria para concursos policiais"); concorrência de mentorias da Gran e de mentores independentes. |
 | [Contato CPPEM](https://github.com/marketing942/Contato-CPPEM) | Página de captura (lead) com argumentos de venda (dores, comparativo, prova social). | HTML/CSS/JS estático (Vercel) | contato.cppem.com.br | `/` | Indexar | **Médio** — Termos genéricos de alta concorrência e conteúdo enxuto; a página serve melhor a buscas de marca e de cauda média. O site institucional (cppem.com.br, fora deste escopo) tende a ser o destino natural dos termos amplos. |
 | [Central de Ajuda CPPEM](https://github.com/marketing942/Central_de_Ajuda) | Central de suporte. | Next.js 16 (SSR, Notion; Docker/Vercel) | central-de-ajuda.cppem.com.br (e confirma.cppem.com.br reescrito para /confirma) | `/`<br>`/[categoria]`<br>`/artigo/[categoria]/[artigo]`<br>`/confirma`<br>`/api/consultar, /api/revalidate`<br>`/robots.txt, /sitemap.xml` | Indexar | **Médio (marca)** — Volume baixo, mas cada artigo responde uma dúvida real e reduz atendimento; `/confirma` protege contra golpes que usam o nome da marca. |
-| [Black Friday CPPEM](https://github.com/marketing942/BlackFriday-CPPEM) | Campanha temporária / captura. | HTML/CSS/JS estático (Vercel) | não identificado | `/` | Indexar enquanto a campanha estiver ativa | **Baixo** — Demanda praticamente só de marca ("black friday CPPEM") e janela de dias. Termos genéricos ("black friday cursos concurso") são de grandes players e notícias. |
+| [Black Friday CPPEM](https://github.com/marketing942/BlackFriday-CPPEM) | Campanha temporária / captura. | HTML/CSS/JS estático (Vercel) | black-friday.cppem.com.br | `/` | Indexar enquanto a campanha estiver ativa | **Baixo** — Demanda praticamente só de marca ("black friday CPPEM") e janela de dias. Termos genéricos ("black friday cursos concurso") são de grandes players e notícias. |
 
 ## Problema, oportunidade e status por repositório
 
 | Repositório | Problema principal | Oportunidade | Prioridade | Implementação | Status |
 |---|---|---|---|---|---|
 | PMPE — Mentoria PMPE | Sem og:image | Concurso com edital aberto: maior janela de demanda do ecossistema até a prova. Mirar "mentoria/preparatório/cronograma PMPE" e ser destino dos links de conteúdo sobre o edital. | P1 | 5/8 itens corrigidos na branch | Aguardando revisão (Draft PR) |
-| Contato Colégio CPPEM | Title sem termo de busca | Aparecer para famílias que procuram escola em Caruaru durante as matrículas 2027, com o diferencial que nenhum concorrente local destaca: cristã + militarizada + preparatória. | P1 | 2/7 itens corrigidos na branch | Aguardando revisão (Draft PR) |
-| SRV PMPE — Super Revisão de Véspera | Sem dados estruturados de evento | Ser o resultado local para "aulão/revisão de véspera PMPE" e aparecer na experiência de eventos do Google. | P1 | 3/5 itens corrigidos na branch | Aguardando revisão (Draft PR) |
+| Contato Colégio CPPEM | Title sem termo de busca | Aparecer para famílias que procuram escola em Caruaru durante as matrículas 2027, com o diferencial que nenhum concorrente local destaca: cristã + militarizada + preparatória. | P1 | 3/7 itens corrigidos na branch | Aguardando revisão (Draft PR) |
+| SRV PMPE — Super Revisão de Véspera | Sem dados estruturados de evento | Ser o resultado local para "aulão/revisão de véspera PMPE" e aparecer na experiência de eventos do Google. | P1 | 4/5 itens corrigidos na branch | Aguardando revisão (Draft PR) |
 | Supletivo | Sem canonical, robots e sitemap num domínio *.vercel.app | Demanda nacional alta; diferencial possível é o atendimento humano local (Caruaru) e a ponte com a graduação Unicive. | P0 | 2/8 itens corrigidos na branch | Aguardando revisão (Draft PR) |
 | Contato Unicive | Title sem termo de busca | Capturar "graduação/tecnólogo EAD em Caruaru" e o nicho de cursos para quem é ou quer ser da segurança pública (Gestão da Atividade Policial, Criminologia, Segurança Privada), que conversa com a base do CPPEM. | P1 | 5/8 itens corrigidos na branch | Aguardando revisão (Draft PR) |
 | Mentoria Individual | Title com marca na frente e sem a categoria | Disputar "mentoria para concursos policiais" com prova de autoridade do mentor e FAQ forte que já existe. | P1 | 5/6 itens corrigidos na branch | Aguardando revisão (Draft PR) |
 | Contato CPPEM | og:image quebrada | Ser a porta de entrada de quem pesquisa "preparatório para concursos policiais" e ainda não conhece a CPPEM, e capturar buscas de marca ("CPPEM", "CPPEM concursos"). | P1 | 8/10 itens corrigidos na branch | Aguardando revisão (Draft PR) |
 | Central de Ajuda CPPEM | Home e categorias sem canonical | Ocupar a SERP de marca com respostas oficiais e trilhas (breadcrumbs), e ser a referência antifraude. | P1 | 4/7 itens corrigidos na branch | Aguardando revisão (Draft PR) |
-| Black Friday CPPEM | Domínio final desconhecido | Capturar quem procura a campanha pelo nome e acumular autoridade ano a ano. | P1 | 4/6 itens corrigidos na branch | Aguardando revisão (Draft PR) |
+| Black Friday CPPEM | Sem canonical, og:url e og:image absolutos | Capturar quem procura a campanha pelo nome e acumular autoridade ano a ano. | P1 | 5/6 itens corrigidos na branch | Aguardando revisão (Draft PR) |
 
 ## Ranking estratégico de oportunidades
 
@@ -58,11 +58,11 @@ existe, senão estimada), condição técnica e risco.
 1. **Maior potencial de tráfego:** Supletivo (demanda nacional) e Mentoria PMPE (edital aberto).
 2. **Melhores oportunidades comerciais:** Mentoria PMPE, Colégio (matrículas 2027) e Super Revisão (ingressos).
 3. **Subaproveitadas:** Colégio (title "Fale com a gente" e sem domínio canônico) e Supletivo (respondia só em *.vercel.app, sem canonical/sitemap, FAQ invisível).
-4. **Prioridade imediata:** merge das correções; informar os 3 domínios; Search Console.
+4. **Prioridade imediata:** Search Console e envio dos sitemaps.
 5. **Pouco benefício de indexação:** Black Friday (sazonal, marca).
 6. **Páginas concorrendo entre si:** Contato CPPEM tinha "(PMPE)" no title (corrigido). Riscos fora do escopo: Contato Unicive × unicive.cppem.com.br; Contato CPPEM × cppem.com.br/turmas; Contato Colégio × site institucional do Colégio.
 7. **Produtos sem página para a intenção:** "edital PMPE 2026" (informacional), cursos de segurança pública da Unicive (uma página por curso), "como verificar se o supletivo é válido".
-8. **Links internos:** feito: Super Revisão → Mentoria PMPE (mesma prova, mesmo público). Propostos: Mentoria PMPE → Super Revisão (quando houver domínio); Contato Unicive (FAQ "sem Ensino Médio") → Supletivo; rodapé das landings → Central de Ajuda/confirma (suporte e antifraude). Não propostos: links entre Colégio e concursos (públicos e ofertas diferentes).
+8. **Links internos:** feito: Super Revisão → Mentoria PMPE (mesma prova, mesmo público). Propostos: Mentoria PMPE → Super Revisão; Contato Unicive (FAQ "sem Ensino Médio") → Supletivo; rodapé das landings → Central de Ajuda/confirma (suporte e antifraude). Não propostos: links entre Colégio e concursos (públicos e ofertas diferentes).
 9. **Palavras sem página apropriada:** "edital PMPE 2026", "TAF PMPE", "gestão da atividade policial EAD", "criminologia EAD", "matrícula 2027 Caruaru", "supletivo é reconhecido pelo MEC".
 10. **Crescimento conjunto:** cada intenção com uma URL dona (tabela abaixo); o domínio principal cppem.com.br concentra conteúdo informacional e distribui links para as landings; as landings ficam focadas em conversão.
 
@@ -72,7 +72,7 @@ existe, senão estimada), condição técnica e risco.
 |---|---|---|
 | preparatório para concursos policiais | cppem.com.br/turmas **ou** contato.cppem.com.br | Decidir; hoje as duas podem disputar |
 | mentoria / preparatório / cronograma PMPE | pmpe.cppem.com.br | Implementado |
-| revisão de véspera / aulão PMPE | Super Revisão (domínio a informar) | Implementado |
+| revisão de véspera / aulão PMPE | srv-pmpe.cppem.com.br | Implementado |
 | edital PMPE 2026 (informacional) | nova página no domínio principal | Proposto |
 | mentoria para concursos policiais | individual.cppem.com.br | Implementado |
 | graduação EAD / tecnólogo em Caruaru | contato.unicive.cppem.com.br **ou** unicive.cppem.com.br | Decidir |
@@ -98,7 +98,7 @@ Nenhum redirecionamento ou consolidação foi implementado: todos têm impacto c
 Para medir depois do merge:
 
 1. Search Console: propriedade de **domínio** `cppem.com.br` (cobre todos os subdomínios) + propriedades de prefixo para `*.vercel.app` se ainda recebem tráfego.
-2. Enviar os sitemaps: `contato.cppem.com.br`, `contato.unicive.cppem.com.br`, `pmpe.cppem.com.br`, `individual.cppem.com.br`, `central-de-ajuda.cppem.com.br`, Supletivo (domínio de produção) e os 3 domínios pendentes.
+2. Enviar os sitemaps: `contato.cppem.com.br`, `contato.unicive.cppem.com.br`, `pmpe.cppem.com.br`, `individual.cppem.com.br`, `central-de-ajuda.cppem.com.br`, `supletivo.cppem.com.br`, `black-friday.cppem.com.br`, `contato.colegio.cppem.com.br` e `srv-pmpe.cppem.com.br`.
 3. Exportar 28 dias **antes** do deploy (impressões, cliques, CTR, posição média por consulta e por página) como linha de base.
 4. Leads orgânicos: o Apps Script já grava `pagina_url` e UTMs; lead sem UTM e com referrer de buscador pode ser marcado como orgânico — exige mudança no `script.js`/Apps Script (aprovação).
 5. GA4: segmento "Organic Search" por página de destino e conversões por landing.
@@ -113,7 +113,7 @@ Para medir depois do merge:
 | 3 | Implementado | Imagens OG 1200×630 absolutas onde o domínio é conhecido (5 projetos) e og:image quebrada corrigida | contato-cppem, contato-unicive, pmpe, mentoria-individual, central_de_ajuda |
 | 4 | Implementado | JSON-LD de evento na Super Revisão e de escola no Colégio | srv-pmpe, contato-colegio |
 | 5 | Implementado | Fotos do carrossel 14,7 MB → 0,74 MB e logos pesados (LCP Unicive 6,2→4,5 s; Mentoria 7,7→6,8 s em laboratório) | contato-cppem, mentoria-individual, contato-unicive |
-| 6 | Depende de você | Informar os domínios de Black Friday, Colégio e Super Revisão → canonical, og:url, og:image e sitemap | blackfriday-cppem, contato-colegio, srv-pmpe |
+| 6 | Implementado | Domínios de Black Friday, Colégio, Super Revisão e Supletivo aplicados: canonical, og:url, og:image e sitemap | blackfriday-cppem, contato-colegio, srv-pmpe, supletivo |
 | 7 | Depende de você | Search Console (propriedade de domínio cppem.com.br) + envio dos sitemaps; linha de base de 28 dias | todos |
 | 8 | Depende de você | Preencher as datas do edital na Mentoria PMPE com o edital oficial (Instituto AOCP) | pmpe |
 | 9 | Depende de você | Google Business Profile do Colégio com o mesmo endereço/telefone do site | contato-colegio |
@@ -121,10 +121,8 @@ Para medir depois do merge:
 
 ## O que depende de você
 
-- **Domínios finais** de Black Friday, Contato Colégio e Super Revisão (e se o Supletivo tem domínio próprio) → completar canonical, og:url, og:image e sitemap.
 - Decisões de URL dona nas intenções marcadas "Decidir".
 - `.vercelignore` para não publicar `README.md`, `TRACKING.md` e `google-apps-script.js` (muda o que vai para o ar; hoje só `docs/seo/` foi excluído).
-- Merge e deploy de cada Draft PR.
 
 ## Limitações
 
